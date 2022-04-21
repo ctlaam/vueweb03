@@ -1,0 +1,87 @@
+.full-icon-header {
+  display: flex;
+  align-items: center;
+}
+.box-icon-header {
+  height: 48px;
+  align-items: center;
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+.icon-header {
+  margin: 0 10px;
+  position: relative;
+}
+.box-icon-header.green:hover {
+  background-color: rgb(44, 160, 28);
+}
+.box-icon-header:hover {
+  background-color: #000;
+}
+.box-icon-header.green:hover::before {
+  content: "";
+  width: 0px;
+  height: 0px;
+  border-width: 8px 22px;
+  border-style: solid;
+  border-color: rgb(0, 0, 0) transparent transparent;
+  position: absolute;
+  bottom: -16px;
+  left: 0px;
+  border-top: 8px solid rgb(44, 160, 28);
+}
+.box-icon-header:hover::before {
+  content: "";
+  width: 0px;
+  height: 0px;
+  border-width: 8px 22px;
+  border-style: solid;
+  border-color: rgb(0, 0, 0) transparent transparent;
+  position: absolute;
+  bottom: -16px;
+  left: 0px;
+  border-top: 8px solid #000;
+}
+.icon-1 {
+  background: url("../../assets/img/Sprites.64af8f61.svg") no-repeat -568px -30px;
+  width: 24px;
+  height: 24px;
+}
+.icon-2 {
+  background: url("../../assets/img/Sprites.64af8f61.svg") no-repeat -676px -30px;
+  width: 24px;
+  height: 24px;
+}
+.icon-3 {
+  background: url("../../assets/img/Sprites.64af8f61.svg") no-repeat -899px -30px;
+  width: 24px;
+  height: 24px;
+}
+.icon-4 {
+  background: url("../../assets/img/Sprites.64af8f61.svg") no-repeat -732px -31px;
+  width: 24px;
+  height: 24px;
+  position: relative;
+}
+.icon-4::after {
+  box-sizing: border-box;
+  content: "Mới";
+  width: 30px;
+  height: 18px;
+  background-color: #ff7f2c;
+  border-radius: 30px;
+  font-size: 10px;
+  padding: 2px 6px;
+  color: #fff;
+  position: absolute;
+  top: -8px;
+  right: -21px;
+  z-index: 10;
+}
+.icon-5 {
+  background: url("../../assets/img/Sprites.64af8f61.svg") no-repeat -788px -30px;
+  width: 24px;
+  height: 24px;
+}

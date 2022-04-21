@@ -1,0 +1,57 @@
+@import url();
+@import url();
+@import url("./components/dialog.css");
+@import url("./components/paging.css");
+@import url("./components/table.css");
+@import url("./components/icon-header.css");
+@import url("./components/combobox.css");
+@import url("./components/item-navbar.css");
+@import url("./layout/navbar.css");
+@import url("./layout/header.css");
+@import url("./layout/content.css");
+
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-size:13px;
+    font-family: MISA NotoSans;
+    color: #111111;
+}
+@font-face {
+    font-family:MISA NotoSans;
+    src: url("../assets/fonts/notosans-regular.2cb88a13.woff2");
+}
+@font-face {
+    font-family:MISA NotoSans Bold;
+    src: url("../assets/fonts/notosans-bold.3ede5aff.woff2");
+}
+@font-face {
+    font-family:MISA NotoSans Italic;
+    src: url("../assets/fonts/notosans-italic.1c1aaac9.woff2");
+}
+li {
+    padding:0  ;
+    list-style-type: none;
+}
+::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 2px grey; 
+    border-radius: 10px;
+  }
+   
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: #babec5;; 
+    border-radius: 12px;
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #ccc; 
+  }

@@ -1,0 +1,105 @@
+.m-paging{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+}
+.m-paging-right{
+    display: flex;
+    width: 423px;
+    align-items: center;
+    justify-content: between;
+}
+.navbar-number{
+    display: flex;
+    width: 190px;
+    align-items: center;
+    justify-content: center;
+}
+.pages{
+    display: flex;
+}
+
+.employee-in-tables{
+    display: flex;
+    border-radius: 2px;
+    border: 1px solid #babec5;
+    align-items: center;
+    justify-content: center;
+    margin-right: 18px;
+    position: relative;
+
+}
+
+.choices-number-employee{
+    display:block;
+    position: absolute;
+    padding:2px 0;
+    border: 1px solid #ccc;
+    top: -130px;
+    background-color: #fff;
+}
+.choice-number-item{
+    width: 194px;
+    height: 30px;
+    padding: 0 14px 0 10px;
+    display: flex;
+    cursor: pointer;
+    align-items: center;
+
+}
+.choice-number-item:hover{
+    color: #75bd6e;
+    background-color: #ebedf0;
+}
+
+.choice-number-item.active{
+    background-color: #2ca01c;
+    color: #fff;
+}
+.icon-choice-number{
+    background: url("../../assets/img/Sprites.88b1c3bd.svg") no-repeat -560px -359px;
+    width: 16px;
+    height: 16px;
+}
+.choice-current-number{
+    width: 166px;
+    height: 30px;
+    padding: 0 0 0 10px;
+    line-height: 30px;
+}
+.box-icon-choice-number{
+    width: 32px;
+    height: 30px;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+}
+.box-icon-choice-number:hover{
+    background-color: #e0e0e0;
+}
+.number-page-item{
+    width: 20px;
+    height: 20px;
+    padding: 0 6.5px;
+    margin-top:2px;
+    display: flex;
+    align-items: center;
+    justify-content:center;
+    cursor: pointer;
+}
+.number-page-item.selected{
+    border: 1px solid #e0e0e0;
+    font-weight: bold;
+}
+.btn-prev{
+    margin-right: 13px;
+
+}
+.btn-next{
+    margin-left: 13px;
+}
+.btn.incapability{
+    opacity: 0.5;
+}

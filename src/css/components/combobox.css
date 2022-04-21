@@ -1,0 +1,25 @@
+.m-combobox{
+    display:flex;
+    justify-content:center;
+    align-items: center;
+    cursor: pointer;
+}
+.m-combobox .placeholder{
+    padding:0 0 0 10px;
+    font-weight: 600;
+    overflow: hidden;
+    white-space: nowrap;
+    font-size:14px;
+}
+.icon-combobox{
+    background: url("../../assets/img/Sprites.64af8f61.svg") no-repeat -84px -361px;
+    width: 14px;
+    height:14px;
+    transform: rotate(90deg);
+    margin: 0 10px;
+    position: relative;
+    top:3px;
+}
+.m-choice-combobox{
+    display:none;
+}
