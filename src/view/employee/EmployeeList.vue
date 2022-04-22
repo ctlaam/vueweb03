@@ -51,7 +51,7 @@
             />
             <div class="icon-search"></div>
           </div>
-          <div class="icon-refresh"></div>
+          <div @click="reloadData" class="icon-refresh"></div>
         </div>
       </div>
       <!-- Table -->
@@ -83,7 +83,7 @@
                 </th>
                 <th
                   class="text-align-left"
-                  style="width: 6%"
+                  style="width: 7%"
                   propName="GenderName"
                 >
                   Giới tính
@@ -97,8 +97,8 @@
                 </th>
                 <th
                   class="text-align-left"
-                  style="width: 8%"
-                  propName="TelephoneNumber"
+                  style="width: 7%"
+                  propName="EmployeeIdentity"
                 >
                   Số CMND
                 </th>
@@ -123,15 +123,23 @@
                 >
                   Số tài khoản
                 </th>
-                <th class="text-align-left" style="width: 9%" propName="Email">
+                <th
+                  class="text-align-left"
+                  style="width: 9%"
+                  propName="Namebank"
+                >
                   Tên ngân hàng
                 </th>
-                <th class="text-align-left" style="width: 16%" propName="Email">
+                <th
+                  class="text-align-left"
+                  style="width: 16%"
+                  propName="PlaceBank"
+                >
                   Chi nhánh tài khoản ngân hàng
                 </th>
                 <th
                   class="text-align-center"
-                  style="width: 7%"
+                  style="width: 8%"
                   propName="Salary"
                   format="Money"
                 >
@@ -140,7 +148,7 @@
               </tr>
             </thead>
             <tbody class="tbody">
-              <tr class="active" v-for="emp in employees" :key="emp.EmployeeId">
+              <tr class="" v-for="emp in employees" :key="emp.EmployeeId">
                 <td class="text-align-center"><input type="checkbox" /></td>
                 <td class="text-align-left">{{ emp.EmployeeCode }}</td>
                 <td
@@ -174,7 +182,7 @@
                         <li class="choice-action-item">Sử dụng</li>
                       </ul>
                     </div>
-                    <div class="icon-action"></div>
+                    <div @click="showChoiceAction" class="icon-action"></div>
                   </div>
                 </td>
               </tr>
@@ -187,14 +195,15 @@
       <div class="m-paging">
         <div class="total-employees">Tổng số : <b>101</b> bản ghi</div>
         <div class="m-paging-right">
-          <div class="employee-in-tables">
+          <div class="employee-in-tables"  ref="cbb">
             <p class="choice-current-number">20 bản ghi trên trang</p>
-            <div class="box-icon-choice-number">
+            <div @click="toggle" class="box-icon-choice-number">
               <div class="icon-choice-number"></div>
             </div>
-            <div class="choices-number-employee">
+            <div v-show="open" class="choices-number-employee">
               <div class="choice-number-item">10 bản ghi trên trang</div>
               <div class="choice-number-item active">20 bản ghi trên trang</div>
+              <div class="choice-number-item">30 bản ghi trên trang</div>
               <div class="choice-number-item">50 bản ghi trên trang</div>
               <div class="choice-number-item">100 bản ghi trên trang</div>
             </div>
@@ -214,7 +223,13 @@
     </div>
     <!-- End maincontent -->
     <!-- EndContent -->
-    <EmployeeDetails :isShow="isShowDialog" @closeOnClick="showOrHideDialog" />
+    <EmployeeDetails
+      @reloadData="reloadData"
+      :isShow="isShowDialog"
+      @closeOnClick="showOrHideDialog"
+      :employeeSelectedInChil="employeeSelected"
+      :formMode="formMode"
+    />
   </div>
 </template>
 
@@ -269,13 +284,45 @@ export default {
       try {
         me.showOrHideDialog(true);
         me.employeeSelected = {};
-        setTimeout(() =>{
-          document.querySelector("#txtEmployeeCode").focus()
-        },100)
-      } catch (error) {
-
+        setTimeout(() => {
+          document.querySelector("#txtEmployeeCode").focus();
+        }, 100);
+      } catch (error) {}
+    },
+    // hàm load lại data mỗi thi crud nhân viên
+    reloadData() {
+      var me = this;
+      // lấy dự liệu danh sách nhiên viên
+      axios
+        .get("http://amis.manhnv.net/api/v1/Employees")
+        .then(function (res) {
+          me.employees = res.data;
+        })
+        .catch(function (err) {
+          // kiểm tra mã lỗi của api và thực hiện thao tác với các mã lỗi đó
+          me.showToastMsgErr(err.response.data.Message);
+        });
+    },
+    showChoicesNumber() {
+      let choices = document.querySelector(".choices-number-employee");
+      if (choices.classList.contains("choices-show")) {
+        choices.classList.remove("choices-show");
+      } else {
+        choices.classList.add("choices-show");
       }
-
+    },
+    showChoiceAction(event) {
+      let nextSibling = event.target.previousElementSibling;
+      let choicesAction = nextSibling.firstElementChild;
+      if (choicesAction.classList.contains("choices-show")) {
+        choicesAction.classList.remove("choices-show");
+      } else {
+        choicesAction.classList.add("choices-show");
+      }
+    },
+    toggle() {
+      this.open = !this.open;
+      console.log(this.open)
     },
   },
   data() {
@@ -286,17 +333,26 @@ export default {
       departments: [],
       // Biến show dialog
       isShowDialog: false,
+      employeeSelected: {},
+      formMode: "",
+      open: false,
     };
   },
   // 2created
   created() {
     var me = this;
+    document.addEventListener("click", function(event){
+      if(!me.$refs.cbb.contains(event.target))
+      {
+        me.open = false;
+      }
+    })
+    
     // lấy dự liệu danh sách nhiên viên
     axios
       .get("http://amis.manhnv.net/api/v1/Employees")
       .then(function (res) {
         me.employees = res.data;
-        console.log(res.data);
       })
       .catch(function (err) {
         // kiểm tra mã lỗi của api và thực hiện thao tác với các mã lỗi đó
@@ -312,7 +368,9 @@ export default {
         // showToastMsgErr(error);
       });
   },
-  mounted() {},
+
+   beforeUnmount() {
+  },
 };
 </script>
 

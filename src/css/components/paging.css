@@ -28,19 +28,26 @@
     justify-content: center;
     margin-right: 18px;
     position: relative;
+    user-select: none;
 
 }
 
 .choices-number-employee{
-    display:block;
+    user-select: none;
     position: absolute;
     padding:2px 0;
     border: 1px solid #ccc;
-    top: -130px;
+    top: -160px;
     background-color: #fff;
 }
+.choices-show{
+    display:block
+}
+.is-active{
+    display:block;
+}
 .choice-number-item{
-    width: 194px;
+    width: 197px;
     height: 30px;
     padding: 0 14px 0 10px;
     display: flex;

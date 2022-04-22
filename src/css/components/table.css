@@ -72,6 +72,7 @@ th:last-child {
   color: #0075c0;
   position: relative;
   font-weight: 600;
+  cursor: pointer;
 }
 .choice-action {
   position: absolute;
@@ -83,9 +84,14 @@ ul.choice-action {
   border: 1px solid #ccc;
   padding: 2px;
   position: absolute;
-  left: -30px;
+  left: -40px;
   top: 25px;
   display: none;
+  background-color: #fff;
+  z-index: 12;
+}
+.choice-action.choices-show{
+  display: block;
 }
 li.choice-action-item {
   padding-left: 8px;
@@ -98,6 +104,9 @@ li.choice-action-item:hover {
 }
 
 tr.active {
+  background-color: #e5f3ff;
+}
+tr:hover{
   background-color: #f2f9ff;
 }
 .form-bank .btn {

@@ -36,7 +36,14 @@
                   Mã <span style="color: red">*</span>
                 </div>
                 <div>
-                  <input id="txtEmployeeCode" type="text" class="input-text input-code" value="" />
+                  <input
+                    @blur="validateEmty"
+                    id="txtEmployeeCode"
+                    type="text"
+                    class="input-text input-code"
+                    value=""
+                    required
+                  />
                 </div>
               </div>
               <div class="form-item">
@@ -44,7 +51,13 @@
                   Tên <span style="color: red">*</span>
                 </div>
                 <div>
-                  <input type="text" class="input-text input-name" value="" />
+                  <input
+                    @blur="validateEmty"
+                    required
+                    type="text"
+                    class="input-text input-name"
+                    value=""
+                  />
                 </div>
               </div>
             </div>
@@ -54,7 +67,11 @@
                   Đơn vị <span style="color: red">*</span>
                 </div>
                 <div class="form-department">
-                  <p class="choice-current-department"></p>
+                  <input
+                    @blur="validateEmty"
+                    required
+                    class="choice-current-department"
+                  />
                   <div class="box-icon-choice-number">
                     <div class="icon-choice-number"></div>
                   </div>
@@ -417,17 +434,36 @@
 <script>
 export default {
   name: "the-employee-detail",
-  props: ["isShow"],
+  props: [
+    "isShow", 
+    "employeeSelectedInChil", 
+    "formMode",
+    ],
+  watch: {
+    employeeSelectedInChil: function (newValue) {
+      this.employee = newValue;
+    },
+  },
   methods: {
     btnCloseDialog() {
-      console.log(123)
       this.$emit("closeOnClick", false);
+    },
+    reloadData() {
+      this.$emit("reloadData");
+    },
+    validateEmty(event) {
+      var el = event.currentTarget;
+      var value = el.value;
+      if (!value) {
+        el.classList.add("error");
+        setTimeout(() => {
+          el.classList.remove("error");
+        }, 3000);
+      }
     },
   },
   data() {
-    return {
-      
-    };
+    return {};
   },
   mounted() {
     document.querySelector(".input-text.input-code");
