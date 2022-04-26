@@ -1,5 +1,5 @@
 @import url();
-@import url();
+@import url("./components/dialog2.css");
 @import url("./components/dialog.css");
 @import url("./components/paging.css");
 @import url("./components/table.css");

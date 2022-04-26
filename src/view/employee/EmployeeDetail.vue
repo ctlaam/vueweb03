@@ -41,8 +41,8 @@
                     id="txtEmployeeCode"
                     type="text"
                     class="input-text input-code"
-                    value=""
                     required
+                    v-model="employee.EmployeeCode"
                   />
                 </div>
               </div>
@@ -56,7 +56,7 @@
                     required
                     type="text"
                     class="input-text input-name"
-                    value=""
+                    v-model="employee.EmployeeName"
                   />
                 </div>
               </div>
@@ -71,27 +71,60 @@
                     @blur="validateEmty"
                     required
                     class="choice-current-department"
+                    v-model="employee.DepartmentName"
                   />
-                  <div class="box-icon-choice-number">
+                  <div
+                    @click="toggleDepartment"
+                    class="box-icon-choice-departments"
+                  >
                     <div class="icon-choice-number"></div>
                   </div>
-                  <div class="choices-department">
+                  <div
+                    v-for="dep in departments"
+                    :key="dep.DepartmentId"
+                    :value="dep.DepartmentId"
+                    class="choices-department"
+                    hidden
+                  >
                     <div class="label-department">
                       <div class="label-code-department">Mã đơn vị</div>
                       <div class="label-name-department">Tên đơn vị</div>
                     </div>
-                    <div class="choice-department-item">
-                      <div class="choice-code-department">001ádasdasd</div>
-                      <div class="choice-name-department">Bộ quốc phòng</div>
-                    </div>
-                    <div class="choice-department-item">
-                      <div class="choice-code-department">002</div>
-                      <div class="choice-name-department">
-                        Bộ phận kinh doanh
+                    <div
+                      v-for="dep in departments"
+                      :key="dep.DepartmentId"
+                      :value="dep.DepartmentId"
+                      class="choice-department-item"
+                      @click="choiceDepartment"
+                    >
+                      <div
+                        class="child-of-item-department choice-code-department"
+                      >
+                        {{ dep.DepartmentId }}
+                      </div>
+                      <div
+                        class="child-of-item-department choice-name-department"
+                      >
+                        {{ dep.DepartmentName }}
                       </div>
                     </div>
                   </div>
                 </div>
+                <!-- <select
+                  class="form-select"
+                  property="DepartmentId"
+                  name=""
+                  id=""
+                  v-model="employee.DepartmentId"
+                >
+                  <option
+                    v-for="dep in departments"
+                    :key="dep.DepartmentId"
+                    :value="dep.DepartmentId"
+                  >
+                    {{ dep.DepartmentName }}
+                  </option>
+                    </select> -->
               </div>
             </div>
             <div class="form-row">
@@ -101,7 +134,7 @@
                   <input
                     type="text"
                     class="input-text input-position"
-                    value=""
+                    v-model="employee.PositionName"
                   />
                 </div>
               </div>
@@ -162,8 +195,6 @@
           </div>
         </div>
         <div class="form-input-second">
-          <!-- <div class="choice-form-second active">Liên hệ</div>
-          <div class="choice-form-second">Tài khoản ngân hàng</div> -->
           <div class="form-contact">
             <div class="form-row">
               <div class="form-item">
@@ -181,7 +212,11 @@
               <div class="form-item">
                 <div class="form-label">ĐT di động</div>
                 <div>
-                  <input type="text" class="input-text input-phone" value="" />
+                  <input
+                    type="text"
+                    class="input-text input-phone"
+                    v-model="employee.PhoneNumber"
+                  />
                 </div>
               </div>
               <div class="form-item">
@@ -193,7 +228,11 @@
               <div class="form-item">
                 <div class="form-label">Email</div>
                 <div>
-                  <input type="text" class="input-text input-email" value="" />
+                  <input
+                    type="text"
+                    class="input-text input-email"
+                    v-model="employee.Email"
+                  />
                 </div>
               </div>
             </div>
@@ -230,189 +269,6 @@
               </div>
             </div>
           </div>
-          <!-- <div class="form-bank">
-            <div class="m-grid-tbl">
-              <div class="m-grid-table">
-                <table class="form-bank-table">
-                  <thead>
-                    <tr>
-                      <th class="text-align-left" style="width:150px">SỐ TÀI KHOẢN <span
-                          class="icon-th-form-bank"></span></th>
-                      <th class="text-align-left" style="width:200px">TÊN NGÂN HÀNG <span
-                          class="icon-th-form-bank"></span> </th>
-                      <th class="text-align-left" style="width:190px">CHI NHÁNH <span class="icon-th-form-bank"></span>
-                      </th>
-                      <th class="text-align-left" style="width:205px">TỈNH/TP CỦA NGÂN HÀNG <span
-                          class="icon-th-form-bank"></span> </th>
-                      <th class="text-align-left" style="width:40px"> </th>
-                    </tr>
-                  </thead>
-                  <tbody class="tbody">
-                    <tr>
-                      <td>
-
-                        <div>
-                          <input type="text" class="input-form-bank form-bank-number" value="">
-                        </div>
-                      </td>
-                      <td>
-
-                        <div>
-                          <input type="text" class="input-form-bank form-bank-name" value="">
-                        </div>
-                      </td>
-                      <td>
-
-                        <div>
-                          <input type="text" class="input-form-bank form-bank-place" value="">
-                        </div>
-                      </td>
-                      <td>
-
-                        <div>
-                          <input type="text" class="input-form-bank form-bank-region" value="">
-                        </div>
-                      </td>
-                      <td>
-                        <div class="box-icon-delete-row-bank">
-                          <div class="icon-delete-row-bank"></div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-
-                        <div>
-                          <input type="text" class="input-form-bank form-bank-number" value="">
-                        </div>
-                      </td>
-                      <td>
-
-                        <div>
-                          <input type="text" class="input-form-bank form-bank-name" value="">
-                        </div>
-                      </td>
-                      <td>
-
-                        <div>
-                          <input type="text" class="input-form-bank form-bank-place" value="">
-                        </div>
-                      </td>
-                      <td>
-
-                        <div>
-                          <input type="text" class="input-form-bank form-bank-region" value="">
-                        </div>
-                      </td>
-                      <td>
-                        <div class="box-icon-delete-row-bank">
-                          <div class="icon-delete-row-bank"></div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-
-                        <div>
-                          <input type="text" class="input-form-bank form-bank-number" value="">
-                        </div>
-                      </td>
-                      <td>
-
-                        <div>
-                          <input type="text" class="input-form-bank form-bank-name" value="">
-                        </div>
-                      </td>
-                      <td>
-
-                        <div>
-                          <input type="text" class="input-form-bank form-bank-place" value="">
-                        </div>
-                      </td>
-                      <td>
-
-                        <div>
-                          <input type="text" class="input-form-bank form-bank-region" value="">
-                        </div>
-                      </td>
-                      <td>
-                        <div class="box-icon-delete-row-bank">
-                          <div class="icon-delete-row-bank"></div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-
-                        <div>
-                          <input type="text" class="input-form-bank form-bank-number" value="">
-                        </div>
-                      </td>
-                      <td>
-
-                        <div>
-                          <input type="text" class="input-form-bank form-bank-name" value="">
-                        </div>
-                      </td>
-                      <td>
-
-                        <div>
-                          <input type="text" class="input-form-bank form-bank-place" value="">
-                        </div>
-                      </td>
-                      <td>
-
-                        <div>
-                          <input type="text" class="input-form-bank form-bank-region" value="">
-                        </div>
-                      </td>
-                      <td>
-                        <div class="box-icon-delete-row-bank">
-                          <div class="icon-delete-row-bank"></div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-
-                        <div>
-                          <input type="text" class="input-form-bank form-bank-number" value="">
-                        </div>
-                      </td>
-                      <td>
-
-                        <div>
-                          <input type="text" class="input-form-bank form-bank-name" value="">
-                        </div>
-                      </td>
-                      <td>
-
-                        <div>
-                          <input type="text" class="input-form-bank form-bank-place" value="">
-                        </div>
-                      </td>
-                      <td>
-
-                        <div>
-                          <input type="text" class="input-form-bank form-bank-region" value="">
-                        </div>
-                      </td>
-                      <td>
-                        <div class="box-icon-delete-row-bank">
-                          <div class="icon-delete-row-bank"></div>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-
-                </table>
-              </div>
-
-            </div>
-            <button class="btn btn-add-row">Thêm dòng</button>
-            <button class="btn btn-delete-r">Xóa hết dòng</button>
-
-          </div> -->
         </div>
         <!-- footer form -->
 
@@ -421,8 +277,9 @@
             <button @click="btnCloseDialog" class="btn btn-cancle">Hủy</button>
           </div>
           <div class="footer-right">
-            <button class="btn btn-save">Cất</button>
+            <button @click="btnSaveOnClick" class="btn btn-save">Cất</button>
             <button class="btn btn-save-add">Cất và thêm</button>
+            <DialogConfirm />
           </div>
         </div>
       </div>
@@ -430,43 +287,189 @@
   </div>
   <!-- End form -->
 </template>
-
 <script>
+/* eslint-disable */
+
+import DialogConfirm from "../dialog/DialogConfirm.vue";
+import DialogError from "../dialog/DialogError.vue";
+import DialogWarning from "../dialog/DialogWarning.vue";
+import axios from "axios";
+
 export default {
   name: "the-employee-detail",
-  props: [
-    "isShow", 
-    "employeeSelectedInChil", 
-    "formMode",
-    ],
+  props: ["isShow", "employeeSelectedInChil", "formMode"],
+  components: {
+    DialogConfirm,
+    DialogError,
+    DialogWarning,
+  },
+  /**
+  * Mô tả : nếu employeeSelectedInChil thay đổi thì gán employee = giá trị mới
+  * @param
+  * @return
+  * Created by: Cao Thanh Lâm - MF1103
+  * Created date: 10:20 22/04/2022
+  */
   watch: {
     employeeSelectedInChil: function (newValue) {
       this.employee = newValue;
     },
   },
   methods: {
+    /**
+    * Mô tả : Đóng dialog
+    * @param
+    * @return
+    * Created by: Cao Thanh Lâm - MF1103
+    * Created date: 13:53 21/04/2022
+    */
     btnCloseDialog() {
       this.$emit("closeOnClick", false);
     },
+    /**
+    * Mô tả : Hàm reload lại dữu liệu
+    * @param
+    * @return
+    * Created by: Cao Thanh Lâm - MF1103
+    * Created date: 13:54 24/04/2022
+    */
     reloadData() {
       this.$emit("reloadData");
     },
+    /**
+    * Mô tả : Validate các dữ liệu bắt buộc
+    * @param
+    * @return
+    * Created by: Cao Thanh Lâm - MF1103
+    * Created date: 13:54 24/04/2022
+    */
     validateEmty(event) {
+
       var el = event.currentTarget;
       var value = el.value;
+      // nếu các trường dữ liệ bắt buộc bị trống thì báo đỏ form input
       if (!value) {
+        // add class error
         el.classList.add("error");
+        // remove class error sau 3s
         setTimeout(() => {
           el.classList.remove("error");
         }, 3000);
       }
     },
+    /**
+    * Mô tả : Lưu dữ liệu
+    * @param
+    * @return
+    * Created by: Cao Thanh Lâm - MF1103
+    * Created date: 13:55 24/04/2022
+    */
+    btnSaveOnClick() {
+      if (this.formMode == this.MISAEnum.FormMode.Add) {
+        // thu thập thông tin nhân viên
+        // gọi api lưu dữ liệu
+        let employee = this.employee;
+        axios
+          .post("http://amis.manhnv.net/api/v1/Employees", employee)
+          .then(() => {
+            this.btnCloseDialog();
+            this.reloadData();
+            alert("Thêm thành công");
+          });
+      } else {
+        // formmode = put
+        let employee = this.employee;
+
+        axios
+          // update dữ liệu employee
+
+          .put(
+            `http://amis.manhnv.net/api/v1/Employees/${employee.EmployeeId}`,
+            employee
+          )
+          .then(() => {
+            this.btnCloseDialog();
+            alert("Sửa thành công");
+          });
+      }
+    },
+    /**
+    * Mô tả : Show dánh sách các phòng bàn
+    * @param
+    * @return
+    * Created by: Cao Thanh Lâm - MF1103
+    * Created date: 13:56 24/04/2022
+    */
+    toggleDepartment() {
+      let choicesDepartments = document.querySelector(".choices-department");
+      // nếu có atrribute hidden thì remove và show
+      if (choicesDepartments.hasAttribute("hidden")) {
+        choicesDepartments.removeAttribute("hidden");
+
+      } 
+      // nếu không có atrribute setAttribute và ẩn
+      else {
+        choicesDepartments.setAttribute("hidden", "true");
+      }
+    },
+    /**
+     * Mô tả : Lấy DepartmentId và gán vào trong object employee
+     * @param
+     * @return
+     * Created by: Cao Thanh Lâm - MF1103
+     * Created date: 12:21 23/04/2022
+     */
+    choiceDepartment(e) {
+      const me = this;
+      let valueDepartment;
+      // nếu e.target chứa class child-of-item-department
+      if (e.target.classList.contains("child-of-item-department")) {
+        // lấy value của phần từ cha chauws child of item department
+        valueDepartment = e.target.parentElement.getAttribute("value");
+        // gán lại vào object employee
+        me.employee.departmentId = valueDepartment;
+        // lấy tên phòng ban và hiển thị gán vào cho vaue của input
+
+        if (e.target.classList.contains("choice-name-department")) {
+          me.employee.DepartmentName = e.target.innerText;
+        }
+         else {
+          me.employee.DepartmentName = e.target.nextElementSibling.innerText;
+        }
+      } else {
+        // nếu e.target k chứa class child-of-item-department
+        valueDepartment = e.target.getAttribute("value");
+        // gán lại vào object employee
+        me.employee.departmentId = valueDepartment;
+        // lấy tên phòng ban và hiển thị gán vào cho vaue của input
+        me.employee.DepartmentName = e.target.querySelector(
+          ".choice-name-department"
+        ).innerText;
+      }
+    },
   },
   data() {
-    return {};
+    return {
+      // Nhân viên dược thêm hoặc sửa
+      employee: {},
+      // danh sách departments
+      departments: [],
+    };
   },
   mounted() {
     document.querySelector(".input-text.input-code");
+  },
+  created() {
+    // lấy dữ liệu từ trên data
+    const me = this;
+    axios
+      .get("http://amis.manhnv.net/api/v1/Departments")
+      .then(function (response) {
+        me.departments = response.data;
+      })
+      .catch(function (error) {
+        showToastMsgErr(error);
+      });
   },
 };
 </script>

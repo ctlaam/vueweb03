@@ -13,6 +13,8 @@ import SellItem from './view/general/SellItem.vue'
 import WareHouse from './view/general/WareHouse.vue'
 
 
+import MISAEnum from './js/enum.js'
+
 
 // định nghĩa các router
 const abc = [
@@ -29,5 +31,6 @@ const router = createRouter({
     routes: abc,
 })
 let app = createApp(App)
+app.config.globalProperties.MISAEnum = MISAEnum
 app.use(router)
 app.mount('#app')

@@ -164,11 +164,11 @@ input:focus{
     position: relative;
     width: 100%;
 }
-.form-department .box-icon-choice-number{
+.form-department .box-icon-choice-departments{
     position:absolute;
     right: 0px;;
 }
-.form-department .box-icon-choice-number:hover{
+.form-department .box-icon-choice-departments:hover{
     border-style: solid;
     border-color: #babec5 ;
     border-width: 1px 1px 1px 0;
@@ -189,10 +189,11 @@ input:focus{
 }
 .label-code-department{
     padding: 0 10px;
-    width: 112px;
+    width: 125px;
     background-color:#f4f5f8;
     height: 32px;
-    line-height:32px
+    line-height:32px;
+
 }
 .label-name-department{
     width: 283px;
@@ -205,13 +206,16 @@ input:focus{
     position:absolute;
     top:32px;
     border:1px solid #babec5;
-    width: 395px;
-    display:none;
+    width: 410px;
+    z-index: 3;
+    user-select: none;
 
 }
 .choice-department-item{
     display: flex;
     align-items: center;
+    background-color: #fff;
+
 }
 .choice-department-item:hover{
     background-color:#e5e5e5
@@ -228,6 +232,9 @@ input:focus{
     height: 32px;
     line-height:32px;
     text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     
 }
 input[required].error{

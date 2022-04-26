@@ -174,10 +174,18 @@
                 <td class="text-align-left">Chi nhánh YASUO</td>
                 <td class="text-align-left">
                   <div class="action-employee">
-                    <div class="default-action">
+                    <div
+                      @click.prevent="editEmployee(emp)"
+                      class="default-action"
+                    >
                       Sửa
                       <ul class="choice-action">
-                        <li class="choice-action-item">Xóa</li>
+                        <li
+                          @click.stop="showDialogDeleteEmployee(emp)"
+                          class="choice-action-item"
+                        >
+                          Xóa
+                        </li>
                         <li class="choice-action-item">Nhân bản</li>
                         <li class="choice-action-item">Sử dụng</li>
                       </ul>
@@ -195,7 +203,7 @@
       <div class="m-paging">
         <div class="total-employees">Tổng số : <b>101</b> bản ghi</div>
         <div class="m-paging-right">
-          <div class="employee-in-tables"  ref="cbb">
+          <div class="employee-in-tables" ref="cbb">
             <p class="choice-current-number">20 bản ghi trên trang</p>
             <div @click="toggle" class="box-icon-choice-number">
               <div class="icon-choice-number"></div>
@@ -221,6 +229,7 @@
         </div>
       </div>
     </div>
+
     <!-- End maincontent -->
     <!-- EndContent -->
     <EmployeeDetails
@@ -230,6 +239,10 @@
       :employeeSelectedInChil="employeeSelected"
       :formMode="formMode"
     />
+    <DialogDelete
+      :employeeSelectedInChil="employeeSelected"
+      @reloadData="reloadData"
+    />
   </div>
 </template>
 
@@ -237,11 +250,13 @@
 /* eslint-disable */
 import axios from "axios";
 import EmployeeDetails from "./EmployeeDetail.vue";
+import DialogDelete from "../dialog/DialogDelete.vue";
 
 export default {
   name: "employee-list",
   components: {
     EmployeeDetails,
+    DialogDelete,
   },
   methods: {
     /**
@@ -276,18 +291,39 @@ export default {
         // show toast error nếu lỗi
       }
     },
+    /**
+    * Mô tả : hàm show or hide dialog
+    * @param isShow:true = show , false = hide
+    * @return
+    * Created by: Cao Thanh Lâm - MF1103
+    * Created date: 13:46 24/04/2022
+    */
     showOrHideDialog(isShow) {
       this.isShowDialog = isShow;
     },
     btnAddOnClick() {
       const me = this;
+
       try {
+        // gán formmode bằng add
+        me.formMode = this.MISAEnum.FormMode.Add;
+        // gán isShowDialog bằng true
         me.showOrHideDialog(true);
+        // gán employeeSelected bằng hàm rỗng
         me.employeeSelected = {};
-        setTimeout(() => {
-          document.querySelector("#txtEmployeeCode").focus();
-        }, 100);
-      } catch (error) {}
+        axios
+          .get("http://amis.manhnv.net/api/v1/Employees/NewEmployeeCode")
+          .then((res) => {
+            me.employeeSelected.EmployeeCode = res.data;
+            // focus vào ô nhâp liệu đầu tiên
+            document.getElementById("txtEmployeeCode").focus();
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      } catch (error) {
+        console.log(error);
+      }
     },
     // hàm load lại data mỗi thi crud nhân viên
     reloadData() {
@@ -303,26 +339,94 @@ export default {
           me.showToastMsgErr(err.response.data.Message);
         });
     },
+    /**
+    * Mô tả : Hàm chọn số lượng bản ghi nhân viên
+    * @param
+    * @return
+    * Created by: Cao Thanh Lâm - MF1103
+    * Created date: 13:44 24/04/2022
+    */
     showChoicesNumber() {
+      // chọn element có class choices-number-employee
       let choices = document.querySelector(".choices-number-employee");
+      // element chứa class choices-show thì tắt
       if (choices.classList.contains("choices-show")) {
         choices.classList.remove("choices-show");
-      } else {
+      }
+      // element chứa class choices-show thì bật
+       else {
         choices.classList.add("choices-show");
       }
     },
+    /**
+     * Mô tả : Hàm show các choice action
+     * @param
+     * @return
+     * Created by: Cao Thanh Lâm - MF1103
+     * Created date: 13:35 24/04/2022
+     */
     showChoiceAction(event) {
+      // Tìm phần tử chứa class choices-action bằng event.target
       let nextSibling = event.target.previousElementSibling;
       let choicesAction = nextSibling.firstElementChild;
+      // nếu phần từ chứa class choices-show thì tắt
       if (choicesAction.classList.contains("choices-show")) {
         choicesAction.classList.remove("choices-show");
-      } else {
+      }
+      // nếu phần từ k chứa class choices-show thì hiển thị
+      else {
+        // truowcss khi hiển thị thì loại bỏ tất ẩn tất cả cách elemnent có class choices-action
+        document.querySelectorAll(".choice-action").forEach((item) => {
+          item.classList.remove("choices-show");
+        });
         choicesAction.classList.add("choices-show");
       }
     },
+    /**
+    * Mô tả : Đóng mở combobox
+    * @param
+    * @return
+    * Created by: Cao Thanh Lâm - MF1103
+    * Created date: 13:51 24/04/2022
+    */
     toggle() {
       this.open = !this.open;
-      console.log(this.open)
+      console.log(this.open);
+    },
+    /**
+     * Mô tả : Mô tả : Hiển thị form cho phép sửa thông tin nhân viên
+     * @param
+     * @return
+     * Created by: Cao Thanh Lâm - MF1103
+     * Created date: 11:00 24/04/2022
+     */
+    editEmployee(emp) {
+      var me = this;
+      me.formMode = this.MISAEnum.FormMode.Edit;
+      this.employeeSelected = emp;
+      setTimeout(function () {
+        document.getElementById("txtEmployeeCode").focus();
+      }, 100);
+      // lấy thông tin nhân viên
+      // C1 lây thôn tin nhân viên có sẵn dưới clients
+      // C2 lấy thông tin nhân viên từ Api
+
+      // binding lên form chi tiết ----> việc ủa component con
+
+      // hiển thi form
+      this.showOrHideDialog(true);
+    },
+    /**
+     * Mô tả : Show dialog xác nhân xóa nhân viên
+     * @param
+     * @return
+     * Created by: Cao Thanh Lâm - MF1103
+     * Created date: 13:33 24/04/2022
+     */
+    showDialogDeleteEmployee(emp) {
+      // hiển thị dilog xác nhận xóa
+      document.querySelector(".m-dialog-delete").removeAttribute("hidden");
+      this.employeeSelected = emp;
     },
   },
   data() {
@@ -333,21 +437,23 @@ export default {
       departments: [],
       // Biến show dialog
       isShowDialog: false,
+      // nhân viên được hconj
       employeeSelected: {},
-      formMode: "",
       open: false,
+      // formMode để biết là form dùng để thêm mới hoặc là sửa
+      formMode: this.MISAEnum.FormMode.Add,
     };
   },
   // 2created
   created() {
     var me = this;
-    document.addEventListener("click", function(event){
-      if(!me.$refs.cbb.contains(event.target))
-      {
+    // phát hiện sự kiện click ra ngoài để từ đó đóng cbb nếu combobox đang được mở
+    document.addEventListener("click", function (event) {
+      if (!me.$refs.cbb.contains(event.target)) {
         me.open = false;
       }
-    })
-    
+    });
+
     // lấy dự liệu danh sách nhiên viên
     axios
       .get("http://amis.manhnv.net/api/v1/Employees")
@@ -369,7 +475,8 @@ export default {
       });
   },
 
-   beforeUnmount() {
+  beforeUnmount() {
+
   },
 };
 </script>
