@@ -1,9 +1,12 @@
 <template>
+
   <div>
     <TheHeader />
     <TheNavbar />
     <TheContent />
   </div>
+
+
 </template>
 <script>
 import TheContent from "./components/layout/TheContent.vue";

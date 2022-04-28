@@ -145,7 +145,13 @@
               <div class="form-item item-date-of-birth">
                 <div class="form-label">Ngày sinh</div>
                 <div>
-                  <input type="date" class="input-text input-date" />
+                  <input
+                    :value="bindingDate(employee.DateOfBirth)"
+                    @change="onChangeFormatDate"
+                    type="date"
+                    class="input-text input-date"
+                    dateOfBirth
+                  />
                 </div>
               </div>
               <div class="form-item item-gender">
@@ -304,47 +310,72 @@ export default {
     DialogWarning,
   },
   /**
-  * Mô tả : nếu employeeSelectedInChil thay đổi thì gán employee = giá trị mới
-  * @param
-  * @return
-  * Created by: Cao Thanh Lâm - MF1103
-  * Created date: 10:20 22/04/2022
-  */
+   * Mô tả : nếu employeeSelectedInChil thay đổi thì gán employee = giá trị mới
+   * @param
+   * @return
+   * Created by: Cao Thanh Lâm - MF1103
+   * Created date: 10:20 22/04/2022
+   */
   watch: {
     employeeSelectedInChil: function (newValue) {
       this.employee = newValue;
     },
   },
   methods: {
+    // fomart dữ liệu date do người dùng nhập vào
+    bindingDate(date) {
+      if (date) {
+        date = new Date(date);
+        // lây ra ngày
+        let day = date.getDate();
+        // lấy tháng
+        let month = date.getMonth() + 1;
+        // lấy năm
+        let year = date.getFullYear();
+        // thêm số 0 vào đằng trước
+        day = day < 10 ? `0${day}` : day;
+        month = month < 10 ? `0${month}` : month;
+        date = year + "-" + month + "-" + day;
+        return date;
+      } else {
+        return "";
+      }
+    },
+    // fomart date ở trong dialog detail
+    onChangeFormatDate(e) {
+      // kiểm tra nếu target chứa attibute "dateofbirth" thì gán employee.dateofbith = value
+      if (e.target.hasAttribute("dateOfBirth")) {
+        this.employee.DateOfBirth = e.target.value;
+      }
+    },
     /**
-    * Mô tả : Đóng dialog
-    * @param
-    * @return
-    * Created by: Cao Thanh Lâm - MF1103
-    * Created date: 13:53 21/04/2022
-    */
+     * Mô tả : Đóng dialog
+     * @param
+     * @return
+     * Created by: Cao Thanh Lâm - MF1103
+     * Created date: 13:53 21/04/2022
+     */
     btnCloseDialog() {
       this.$emit("closeOnClick", false);
     },
     /**
-    * Mô tả : Hàm reload lại dữu liệu
-    * @param
-    * @return
-    * Created by: Cao Thanh Lâm - MF1103
-    * Created date: 13:54 24/04/2022
-    */
+     * Mô tả : Hàm reload lại dữu liệu
+     * @param
+     * @return
+     * Created by: Cao Thanh Lâm - MF1103
+     * Created date: 13:54 24/04/2022
+     */
     reloadData() {
       this.$emit("reloadData");
     },
     /**
-    * Mô tả : Validate các dữ liệu bắt buộc
-    * @param
-    * @return
-    * Created by: Cao Thanh Lâm - MF1103
-    * Created date: 13:54 24/04/2022
-    */
+     * Mô tả : Validate các dữ liệu bắt buộc
+     * @param
+     * @return
+     * Created by: Cao Thanh Lâm - MF1103
+     * Created date: 13:54 24/04/2022
+     */
     validateEmty(event) {
-
       var el = event.currentTarget;
       var value = el.value;
       // nếu các trường dữ liệ bắt buộc bị trống thì báo đỏ form input
@@ -358,12 +389,12 @@ export default {
       }
     },
     /**
-    * Mô tả : Lưu dữ liệu
-    * @param
-    * @return
-    * Created by: Cao Thanh Lâm - MF1103
-    * Created date: 13:55 24/04/2022
-    */
+     * Mô tả : Lưu dữ liệu
+     * @param
+     * @return
+     * Created by: Cao Thanh Lâm - MF1103
+     * Created date: 13:55 24/04/2022
+     */
     btnSaveOnClick() {
       if (this.formMode == this.MISAEnum.FormMode.Add) {
         // thu thập thông tin nhân viên
@@ -372,9 +403,12 @@ export default {
         axios
           .post("http://amis.manhnv.net/api/v1/Employees", employee)
           .then(() => {
+            this.TheLoading(1500);
             this.btnCloseDialog();
             this.reloadData();
-            alert("Thêm thành công");
+            setTimeout(() => {
+              this.showToastMsgSuccess("Thêm nhân viên thành công");
+            }, 1500);
           });
       } else {
         // formmode = put
@@ -388,25 +422,25 @@ export default {
             employee
           )
           .then(() => {
+            this.TheLoading(1500);
             this.btnCloseDialog();
-            alert("Sửa thành công");
+            this.showToastMsgSuccess("Cập nhật nhân viên thành công");
           });
       }
     },
     /**
-    * Mô tả : Show dánh sách các phòng bàn
-    * @param
-    * @return
-    * Created by: Cao Thanh Lâm - MF1103
-    * Created date: 13:56 24/04/2022
-    */
+     * Mô tả : Show dánh sách các phòng bàn
+     * @param
+     * @return
+     * Created by: Cao Thanh Lâm - MF1103
+     * Created date: 13:56 24/04/2022
+     */
     toggleDepartment() {
       let choicesDepartments = document.querySelector(".choices-department");
       // nếu có atrribute hidden thì remove và show
       if (choicesDepartments.hasAttribute("hidden")) {
         choicesDepartments.removeAttribute("hidden");
-
-      } 
+      }
       // nếu không có atrribute setAttribute và ẩn
       else {
         choicesDepartments.setAttribute("hidden", "true");
@@ -432,9 +466,10 @@ export default {
 
         if (e.target.classList.contains("choice-name-department")) {
           me.employee.DepartmentName = e.target.innerText;
-        }
-         else {
+          me.toggleDepartment();
+        } else {
           me.employee.DepartmentName = e.target.nextElementSibling.innerText;
+          me.toggleDepartment();
         }
       } else {
         // nếu e.target k chứa class child-of-item-department
@@ -445,7 +480,14 @@ export default {
         me.employee.DepartmentName = e.target.querySelector(
           ".choice-name-department"
         ).innerText;
+        me.toggleDepartment();
       }
+    },
+    showToastMsgSuccess(msg) {
+      this.$emit("showToastMsgSuccess", msg);
+    },
+    TheLoading(ms) {
+      this.$emit("TheLoading", ms);
     },
   },
   data() {

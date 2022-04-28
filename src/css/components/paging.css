@@ -6,13 +6,13 @@
 }
 .m-paging-right{
     display: flex;
-    width: 423px;
+    min-width: 423px;
     align-items: center;
     justify-content: between;
 }
 .navbar-number{
     display: flex;
-    width: 190px;
+    min-width: 190px;
     align-items: center;
     justify-content: center;
 }
@@ -37,7 +37,7 @@
     position: absolute;
     padding:2px 0;
     border: 1px solid #ccc;
-    top: -160px;
+    top: -190px;
     background-color: #fff;
 }
 .choices-show{
@@ -47,7 +47,7 @@
     display:block;
 }
 .choice-number-item{
-    width: 197px;
+    width: 198px;
     height: 30px;
     padding: 0 14px 0 10px;
     display: flex;
@@ -102,11 +102,20 @@
 }
 .btn-prev{
     margin-right: 13px;
+    cursor: pointer;
 
 }
 .btn-next{
     margin-left: 13px;
+    cursor: pointer;
+    
 }
 .btn.incapability{
     opacity: 0.5;
+    cursor: default;
+}
+.btn{
+    opacity: 1;
+    user-select: none;
+
 }

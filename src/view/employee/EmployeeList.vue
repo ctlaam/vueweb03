@@ -37,8 +37,8 @@
     <div class="main-content">
       <div class="header-main-content">
         <div id="peform-all" class="main-content-left">
-          <div class="convenient-header">
-            <div class="name-convenient">
+          <div id="convenient-header2" class="convenient-header">
+            <div @click="deleteEmployees" class="name-convenient">
               Thực hiện hàng loạt<span class="icon-convenient"></span>
             </div>
           </div>
@@ -48,8 +48,10 @@
             <input
               class="input-search"
               placeholder="Tìm theo mã,tên nhân viên"
+              v-model="searchValue"
+              @keyup.enter="filterEmployee"
             />
-            <div class="icon-search"></div>
+            <div @click="filterEmployee" class="icon-search"></div>
           </div>
           <div @click="reloadData" class="icon-refresh"></div>
         </div>
@@ -64,6 +66,7 @@
                   class="text-align-center"
                   style="width: 3%"
                   propName="Checkbox"
+                  @click="checkAll"
                 >
                   <input type="checkbox" />
                 </th>
@@ -149,7 +152,13 @@
             </thead>
             <tbody class="tbody">
               <tr class="" v-for="emp in employees" :key="emp.EmployeeId">
-                <td class="text-align-center"><input type="checkbox" /></td>
+                <td class="text-align-center">
+                  <input
+                    @click="check"
+                    type="checkbox"
+                    :value="emp.EmployeeId"
+                  />
+                </td>
                 <td class="text-align-left">{{ emp.EmployeeCode }}</td>
                 <td
                   class="text-align-left"
@@ -201,30 +210,57 @@
       <!--  Paging -->
 
       <div class="m-paging">
-        <div class="total-employees">Tổng số : <b>101</b> bản ghi</div>
+        <div class="total-employees">
+          Tổng số : <b>{{ totalEmployees }}</b> bản ghi
+        </div>
         <div class="m-paging-right">
           <div class="employee-in-tables" ref="cbb">
-            <p class="choice-current-number">20 bản ghi trên trang</p>
+            <p class="choice-current-number">Tất cả các bản ghi</p>
             <div @click="toggle" class="box-icon-choice-number">
               <div class="icon-choice-number"></div>
             </div>
-            <div v-show="open" class="choices-number-employee">
-              <div class="choice-number-item">10 bản ghi trên trang</div>
-              <div class="choice-number-item active">20 bản ghi trên trang</div>
-              <div class="choice-number-item">30 bản ghi trên trang</div>
-              <div class="choice-number-item">50 bản ghi trên trang</div>
-              <div class="choice-number-item">100 bản ghi trên trang</div>
+            <div
+              @click="choiceNumberEmployeeInTables"
+              v-show="open"
+              class="choices-number-employee"
+            >
+              <div class="choice-number-item" value="10">
+                10 bản ghi trên trang
+              </div>
+              <div class="choice-number-item" value="20">
+                20 bản ghi trên trang
+              </div>
+              <div class="choice-number-item" value="30">
+                30 bản ghi trên trang
+              </div>
+              <div class="choice-number-item" value="50">
+                50 bản ghi trên trang
+              </div>
+              <div class="choice-number-item" value="100">
+                100 bản ghi trên trang
+              </div>
+              <div class="choice-number-item active" :value="totalEmployees">
+                Tất cả các bản ghi
+              </div>
             </div>
           </div>
           <div class="navbar-number">
-            <div class="btn btn-prev incapability">Trước</div>
-            <div class="pages">
-              <div class="number-page-item selected">1</div>
-              <div class="number-page-item">2</div>
-              <div class="number-page-item">...</div>
-              <div class="number-page-item">5</div>
+            <div @click="prePage" class="btn btn-prev incapability">Trước</div>
+            <div
+              v-for="(index, page) in totalNumberPage"
+              :key="index"
+              class="pages"
+            >
+              <div
+                @click="choiceNumberPage"
+                class="number-page-item"
+                :value="page + 1"
+              >
+                {{ page + 1 }}
+              </div>
+              <div v-if="false" class="number-page-item">...</div>
             </div>
-            <div class="btn btn-next">Sau</div>
+            <div @click="nextPage" class="btn btn-next incapability">Sau</div>
           </div>
         </div>
       </div>
@@ -238,11 +274,20 @@
       @closeOnClick="showOrHideDialog"
       :employeeSelectedInChil="employeeSelected"
       :formMode="formMode"
+      @showToastMsgSuccess="showToastMsgSuccess"
+      @TheLoading="TheLoading"
     />
     <DialogDelete
       :employeeSelectedInChil="employeeSelected"
       @reloadData="reloadData"
+      @showToastMsgSuccess="showToastMsgSuccess"
+      @TheLoading="TheLoading"
+      :employeesSelected="employeesSelected"
+      :msgDelete="msgDelete"
+      :formMode="formMode"
     />
+    <ToastSuccess :msgToast="msgToast" />
+    <TheLoading />
   </div>
 </template>
 
@@ -251,12 +296,16 @@
 import axios from "axios";
 import EmployeeDetails from "./EmployeeDetail.vue";
 import DialogDelete from "../dialog/DialogDelete.vue";
+import ToastSuccess from "../toast/ToastSuccess.vue";
+import TheLoading from "../loading/FakeTheLoading.vue";
 
 export default {
   name: "employee-list",
   components: {
     EmployeeDetails,
     DialogDelete,
+    ToastSuccess,
+    TheLoading,
   },
   methods: {
     /**
@@ -292,12 +341,12 @@ export default {
       }
     },
     /**
-    * Mô tả : hàm show or hide dialog
-    * @param isShow:true = show , false = hide
-    * @return
-    * Created by: Cao Thanh Lâm - MF1103
-    * Created date: 13:46 24/04/2022
-    */
+     * Mô tả : hàm show or hide dialog
+     * @param isShow:true = show , false = hide
+     * @return
+     * Created by: Cao Thanh Lâm - MF1103
+     * Created date: 13:46 24/04/2022
+     */
     showOrHideDialog(isShow) {
       this.isShowDialog = isShow;
     },
@@ -329,23 +378,16 @@ export default {
     reloadData() {
       var me = this;
       // lấy dự liệu danh sách nhiên viên
-      axios
-        .get("http://amis.manhnv.net/api/v1/Employees")
-        .then(function (res) {
-          me.employees = res.data;
-        })
-        .catch(function (err) {
-          // kiểm tra mã lỗi của api và thực hiện thao tác với các mã lỗi đó
-          me.showToastMsgErr(err.response.data.Message);
-        });
+      me.TheLoading(2000);
+      me.filterEmployee();
     },
     /**
-    * Mô tả : Hàm chọn số lượng bản ghi nhân viên
-    * @param
-    * @return
-    * Created by: Cao Thanh Lâm - MF1103
-    * Created date: 13:44 24/04/2022
-    */
+     * Mô tả : Hàm chọn số lượng bản ghi nhân viên
+     * @param
+     * @return
+     * Created by: Cao Thanh Lâm - MF1103
+     * Created date: 13:44 24/04/2022
+     */
     showChoicesNumber() {
       // chọn element có class choices-number-employee
       let choices = document.querySelector(".choices-number-employee");
@@ -354,7 +396,7 @@ export default {
         choices.classList.remove("choices-show");
       }
       // element chứa class choices-show thì bật
-       else {
+      else {
         choices.classList.add("choices-show");
       }
     },
@@ -383,15 +425,14 @@ export default {
       }
     },
     /**
-    * Mô tả : Đóng mở combobox
-    * @param
-    * @return
-    * Created by: Cao Thanh Lâm - MF1103
-    * Created date: 13:51 24/04/2022
-    */
+     * Mô tả : Đóng mở combobox
+     * @param
+     * @return
+     * Created by: Cao Thanh Lâm - MF1103
+     * Created date: 13:51 24/04/2022
+     */
     toggle() {
       this.open = !this.open;
-      console.log(this.open);
     },
     /**
      * Mô tả : Mô tả : Hiển thị form cho phép sửa thông tin nhân viên
@@ -402,11 +443,16 @@ export default {
      */
     editEmployee(emp) {
       var me = this;
+
       me.formMode = this.MISAEnum.FormMode.Edit;
       this.employeeSelected = emp;
       setTimeout(function () {
         document.getElementById("txtEmployeeCode").focus();
-      }, 100);
+        if (document.querySelector(".input-text.input-date").value) {
+          document.querySelector(".input-text.input-date").style.color =
+            "black";
+        }
+      }, 50);
       // lấy thông tin nhân viên
       // C1 lây thôn tin nhân viên có sẵn dưới clients
       // C2 lấy thông tin nhân viên từ Api
@@ -424,9 +470,197 @@ export default {
      * Created date: 13:33 24/04/2022
      */
     showDialogDeleteEmployee(emp) {
+      const me = this;
+      me.msgDelete = "";
       // hiển thị dilog xác nhận xóa
       document.querySelector(".m-dialog-delete").removeAttribute("hidden");
       this.employeeSelected = emp;
+      me.formMode = this.MISAEnum.FormMode.Delete;
+    },
+    /**
+     * Mô tả : Show toast msg
+     * @param
+     * @return
+     * Created by: Cao Thanh Lâm - MF1103
+     * Created date: 19:04 26/04/2022
+     */
+    showToastMsgSuccess(msg) {
+      let toastMsgSuccess = document.querySelector(".container-toast");
+      this.msgToast = msg;
+      toastMsgSuccess.removeAttribute("hidden");
+      setTimeout(() => toastMsgSuccess.setAttribute("hidden", "true"), 3000);
+    },
+    filterEmployee() {
+      const me = this;
+
+      axios
+        .get(
+          `http://amis.manhnv.net/api/v1/Employees/filter?pageSize=${me.quantityEmployeeDefault}&pageNumber=${me.numberPageSelected}&employeeFilter=${me.searchValue}`
+        )
+        .then(function (res) {
+          me.employees = res.data.Data;
+          me.totalNumberPage = res.data.TotalPage;
+          me.totalEmployees = res.data.TotalRecord;
+          if (!me.employees) {
+            me.numberPageSelected = 1;
+            if (me.searchValue) {
+              console.log("không có nhân viên nào");
+              me.totalNumberPage = 1;
+              me.defaultPageNumberEmployee();
+            } else {
+              me.filterEmployee();
+            }
+
+            setTimeout(() => {
+              me.defaultPageNumberEmployee();
+            }, 100);
+          }
+          setTimeout(() => {
+            let numberpageSelected = document
+              .querySelector("div[value].number-page-item.selected")
+              .getAttribute("value");
+            if (numberpageSelected > 1) {
+              document
+                .querySelector(".btn-prev")
+                .classList.remove("incapability");
+              document
+                .querySelector(".btn-next")
+                .classList.remove("incapability");
+              if (numberpageSelected == me.totalNumberPage) {
+                document
+                  .querySelector(".btn-next")
+                  .classList.add("incapability");
+              }
+            } else if (numberpageSelected == 1 && me.totalNumberPage > 1) {
+              document.querySelector(".btn-prev").classList.add("incapability");
+              document
+                .querySelector(".btn-next")
+                .classList.remove("incapability");
+            } else if (numberpageSelected == 1 && me.totalNumberPage == 1) {
+              document.querySelector(".btn-prev").classList.add("incapability");
+              document.querySelector(".btn-next").classList.add("incapability");
+            } else {
+              document.querySelector(".btn-prev").classList.add("incapability");
+              document.querySelector(".btn-next").classList.add("incapability");
+            }
+          }, 110);
+        })
+        .catch(function (err) {
+          // kiểm tra mã lỗi của api và thực hiện thao tác với các mã lỗi đó
+          // me.showToastMsgErr(err.response.data.devMsg);
+        });
+    },
+    TheLoading(ms) {
+      let loading = document.getElementById("preloader");
+      loading.removeAttribute("hidden");
+      setTimeout(() => loading.setAttribute("hidden", "true"), ms);
+    },
+
+    // paging
+    choiceNumberPage(e) {
+      let pagesNumberEmployee = document.querySelectorAll(".number-page-item");
+      pagesNumberEmployee.forEach((item) => {
+        item.classList.remove("selected");
+      });
+      let pageNumberSelected = e.target;
+      pageNumberSelected.classList.add("selected");
+      this.numberPageSelected = pageNumberSelected.getAttribute("value");
+
+      this.filterEmployee();
+    },
+    defaultPageNumberEmployee() {
+      document
+        .querySelectorAll(".number-page-item")[0]
+        .classList.add("selected");
+    },
+    choiceNumberEmployeeInTables(e) {
+      let me = this;
+      let choiceNumberEmployeeInTable = e.target;
+      let conditionsNumberEmployee =
+        choiceNumberEmployeeInTable.classList.contains("choice-number-item");
+      if (conditionsNumberEmployee) {
+        document.querySelectorAll(".choice-number-item").forEach((item) => {
+          item.classList.remove("active");
+        });
+        choiceNumberEmployeeInTable.classList.add("active");
+        let choiceCurrentDisplay = document.querySelector(
+          ".choice-current-number"
+        );
+        choiceCurrentDisplay.innerHTML = choiceNumberEmployeeInTable.innerHTML;
+        me.quantityEmployeeDefault =
+          choiceNumberEmployeeInTable.getAttribute("value");
+        me.filterEmployee();
+      }
+    },
+    prePage() {
+      const me = this;
+      let pageNowSelected = document.querySelector(
+        ".number-page-item.selected"
+      );
+      if (pageNowSelected.getAttribute("value") > 1) {
+        pageNowSelected.classList.remove("selected");
+        let prevPageNowSelected =
+          pageNowSelected.parentElement.previousElementSibling.children[0];
+        prevPageNowSelected.classList.add("selected");
+        me.numberPageSelected = prevPageNowSelected.getAttribute("value");
+        me.filterEmployee();
+      }
+    },
+    nextPage() {
+      const me = this;
+      let pageNowSelected = document.querySelector(
+        ".number-page-item.selected"
+      );
+      if (pageNowSelected.getAttribute("value") < me.totalNumberPage) {
+        pageNowSelected.classList.remove("selected");
+        let nextPageNowSelected =
+          pageNowSelected.parentElement.nextElementSibling.children[0];
+        nextPageNowSelected.classList.add("selected");
+        me.numberPageSelected = nextPageNowSelected.getAttribute("value");
+        me.filterEmployee();
+      }
+    },
+    // delete nhiều Employees
+    checkAll(e) {
+      if (e.target.checked) {
+        document.querySelector("#convenient-header2").classList.add("active");
+        let checkedInput = document.querySelectorAll("td input[type=checkbox]");
+        checkedInput.forEach((item) => {
+          item.checked = true;
+        });
+      } else {
+        let checkedInput = document.querySelectorAll("td input[type=checkbox]");
+        checkedInput.forEach((item) => {
+          item.checked = false;
+        });
+        document
+          .querySelector("#convenient-header2")
+          .classList.remove("active");
+      }
+    },
+    check() {
+      let check = document.querySelector("input[type=checkbox]:checked");
+      if (check) {
+        document.querySelector("#convenient-header2").classList.add("active");
+      } else {
+        document
+          .querySelector("#convenient-header2")
+          .classList.remove("active");
+      }
+    },
+    deleteEmployees() {
+      const me = this;
+      me.employeesSelected = [];
+      let a = document.querySelectorAll("td input[type=checkbox]:checked");
+      console.log(a.length);
+      if (a.length) {
+        document.querySelector(".m-dialog-delete").removeAttribute("hidden");
+        me.formMode = this.MISAEnum.FormMode.DeleteRows;
+        a.forEach((item) => {
+          me.employeesSelected.push(item.getAttribute("value"));
+        });
+        me.msgDelete = `Ban có muốn xóa ${me.employeesSelected.length} nhân viên đã chọn không`;
+      }
     },
   },
   data() {
@@ -442,28 +676,47 @@ export default {
       open: false,
       // formMode để biết là form dùng để thêm mới hoặc là sửa
       formMode: this.MISAEnum.FormMode.Add,
+      //msg cho toast
+      msgToast: "",
+      //giá trị search
+      searchValue: "",
+      quantityEmployeeDefault: "",
+      totalNumberPage: 1,
+      numberPageSelected: 1,
+      totalEmployees: "",
+      // Danh sách nhân viên được chọn
+      employeesSelected: [],
+      msgDelete: "",
     };
   },
   // 2created
   created() {
-    var me = this;
+    const me = this;
+
     // phát hiện sự kiện click ra ngoài để từ đó đóng cbb nếu combobox đang được mở
-    document.addEventListener("click", function (event) {
-      if (!me.$refs.cbb.contains(event.target)) {
-        me.open = false;
-      }
-    });
+    try {
+      document.addEventListener("click", function (event) {
+        if (!me.$refs.cbb.contains(event.target)) {
+          me.open = false;
+        }
+      });
+    } catch (error) {
+      console.log(error);
+    }
 
     // lấy dự liệu danh sách nhiên viên
     axios
       .get("http://amis.manhnv.net/api/v1/Employees")
       .then(function (res) {
         me.employees = res.data;
+        me.totalEmployees = res.data.length;
+        me.quantityEmployeeDefault = res.data.length;
       })
       .catch(function (err) {
         // kiểm tra mã lỗi của api và thực hiện thao tác với các mã lỗi đó
         // me.showToastMsgErr(err.response.data.devMsg);
       });
+
     // lấy dữ liệu phòng ban
     axios
       .get("http://amis.manhnv.net/api/v1/Departments")
@@ -474,10 +727,12 @@ export default {
         // showToastMsgErr(error);
       });
   },
-
-  beforeUnmount() {
-
+  mounted() {
+    this.defaultPageNumberEmployee();
+    this.TheLoading(3500);
   },
+
+  beforeUnmount() {},
 };
 </script>
 
