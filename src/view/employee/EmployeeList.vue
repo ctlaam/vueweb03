@@ -453,6 +453,7 @@ export default {
             "black";
         }
       }, 50);
+      document.querySelector(".input-text.input-date").style.color = "#ccc";  
       // lấy thông tin nhân viên
       // C1 lây thôn tin nhân viên có sẵn dưới clients
       // C2 lấy thông tin nhân viên từ Api
@@ -513,7 +514,7 @@ export default {
 
             setTimeout(() => {
               me.defaultPageNumberEmployee();
-            }, 100);
+            }, 200);
           }
           setTimeout(() => {
             let numberpageSelected = document
@@ -550,6 +551,14 @@ export default {
           // me.showToastMsgErr(err.response.data.devMsg);
         });
     },
+
+    /**
+     * Mô tả : fake load dữ liệu
+     * @param ms số s muốn fake
+     * @return
+     * Created by: Cao Thanh Lâm
+     * Created date: 09:44 29/04/2022
+     */
     TheLoading(ms) {
       let loading = document.getElementById("preloader");
       loading.removeAttribute("hidden");
@@ -557,6 +566,13 @@ export default {
     },
 
     // paging
+    /**
+     * Mô tả : lựa chọn page number
+     * @param
+     * @return
+     * Created by: Cao Thanh Lâm
+     * Created date: 09:45 29/04/2022
+     */
     choiceNumberPage(e) {
       let pagesNumberEmployee = document.querySelectorAll(".number-page-item");
       pagesNumberEmployee.forEach((item) => {

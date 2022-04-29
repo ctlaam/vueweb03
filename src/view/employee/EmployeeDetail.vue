@@ -35,8 +35,9 @@
                 <div class="form-label">
                   Mã <span style="color: red">*</span>
                 </div>
-                <div>
+                <div data-content="Mã không được để trống">
                   <input
+                    novalidate
                     @blur="validateEmty"
                     id="txtEmployeeCode"
                     type="text"
@@ -50,8 +51,9 @@
                 <div class="form-label">
                   Tên <span style="color: red">*</span>
                 </div>
-                <div>
+                <div data-content="Tên nhân viên không được để trống">
                   <input
+                    novalidate
                     @blur="validateEmty"
                     required
                     type="text"
@@ -66,8 +68,12 @@
                 <div class="form-label">
                   Đơn vị <span style="color: red">*</span>
                 </div>
-                <div class="form-department">
+                <div
+                  data-content="Đơn vị không được phép để trống"
+                  class="form-department"
+                >
                   <input
+                    novalidate
                     @blur="validateEmty"
                     required
                     class="choice-current-department"
@@ -284,7 +290,9 @@
           </div>
           <div class="footer-right">
             <button @click="btnSaveOnClick" class="btn btn-save">Cất</button>
-            <button class="btn btn-save-add">Cất và thêm</button>
+            <button @click="btnSaveOnClick" class="btn btn-save-add">
+              Cất và thêm
+            </button>
             <DialogConfirm />
           </div>
         </div>
@@ -343,6 +351,9 @@ export default {
     },
     // fomart date ở trong dialog detail
     onChangeFormatDate(e) {
+      if (e.target.value) {
+        document.querySelector(".input-text.input-date").style.color = "black";
+      }
       // kiểm tra nếu target chứa attibute "dateofbirth" thì gán employee.dateofbith = value
       if (e.target.hasAttribute("dateOfBirth")) {
         this.employee.DateOfBirth = e.target.value;
@@ -380,11 +391,14 @@ export default {
       var value = el.value;
       // nếu các trường dữ liệ bắt buộc bị trống thì báo đỏ form input
       if (!value) {
+        let a = el.parentElement.previousElementSibling;
+        a.classList.add("error");
         // add class error
         el.classList.add("error");
         // remove class error sau 3s
         setTimeout(() => {
           el.classList.remove("error");
+          a.classList.remove("error");
         }, 3000);
       }
     },
@@ -395,7 +409,8 @@ export default {
      * Created by: Cao Thanh Lâm - MF1103
      * Created date: 13:55 24/04/2022
      */
-    btnSaveOnClick() {
+    btnSaveOnClick(e) {
+      let me = this;
       if (this.formMode == this.MISAEnum.FormMode.Add) {
         // thu thập thông tin nhân viên
         // gọi api lưu dữ liệu
@@ -404,12 +419,26 @@ export default {
           .post("http://amis.manhnv.net/api/v1/Employees", employee)
           .then(() => {
             this.TheLoading(1500);
-            this.btnCloseDialog();
+            if (e.target.classList.contains("btn-save-add")) {
+              me.employee = {};
+              axios
+                .get("http://amis.manhnv.net/api/v1/Employees/NewEmployeeCode")
+                .then((res) => {
+                  me.employee.EmployeeCode = res.data;
+                  // focus vào ô nhâp liệu đầu tiên
+                  document.getElementById("txtEmployeeCode").focus();
+                });
+            } else if (e.target.classList.contains("btn-save")) {
+              this.btnCloseDialog();
+            }
             this.reloadData();
             setTimeout(() => {
               this.showToastMsgSuccess("Thêm nhân viên thành công");
             }, 1500);
-          });
+          })
+          .catch((error) => {
+            console.log(error.response.data.userMsg)
+          })
       } else {
         // formmode = put
         let employee = this.employee;
@@ -423,7 +452,18 @@ export default {
           )
           .then(() => {
             this.TheLoading(1500);
-            this.btnCloseDialog();
+            if (e.target.classList.contains("btn-save-add")) {
+              me.employee = {};
+              axios
+                .get("http://amis.manhnv.net/api/v1/Employees/NewEmployeeCode")
+                .then((res) => {
+                  me.employee.EmployeeCode = res.data;
+                  // focus vào ô nhâp liệu đầu tiên
+                  document.getElementById("txtEmployeeCode").focus();
+                });
+            } else if (e.target.classList.contains("btn-save")) {
+              this.btnCloseDialog();
+            }
             this.showToastMsgSuccess("Cập nhật nhân viên thành công");
           });
       }
