@@ -186,7 +186,7 @@ input[type=checkbox]:checked:after {
 .form-label.error+div{
   position: relative;
 }
-.form-label.error+div::after {
+.form-label.error+div:hover::after {
   content: attr(data-content);
   min-width: 40px;
   padding: 2px 2px;

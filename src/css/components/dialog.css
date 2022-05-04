@@ -259,6 +259,14 @@ input[type='radio']{
     position: relative;
 
 }
+input[type='radio']:focus::after{
+    content: '';
+    width: 40px;
+    height: 40px;
+    background-color:green;
+
+}
+
 
 input[type='radio']:checked::before{
     content:"";
@@ -383,17 +391,17 @@ input[type='radio']:checked:after {
     cursor: pointer;
     font-weight: 600;
 }
-.footer-form .btn:hover{
+.footer-form .btn:hover,.footer-form .btn:focus{
     background-color: #d2d3d6;
 }
 .btn.btn-save-add{
-    background-color: #35bf22;
+    background-color: #2ca01c;
     color: #fff;
     border-color: #fff;
     margin-left: 5px;
 }
-.btn.btn-save-add:hover{
-    background-color: #2ca01c;
+.btn.btn-save-add:hover,.btn.btn-save-add:focus{
+    background-color: #35bf22;
     color: #fff;
     border-color: #fff;
 

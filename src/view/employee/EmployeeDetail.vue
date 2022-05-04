@@ -2,7 +2,6 @@
   <!-- Form-details-employee-->
   <div
     @keyup.esc="btnCloseDialog"
-    tabindex="0"
     class="m-dialog-form"
     :class="{ 'm-dialog-show': isShow }"
   >
@@ -37,6 +36,7 @@
                 </div>
                 <div data-content="Mã không được để trống">
                   <input
+                    tabindex="1"
                     novalidate
                     @blur="validateEmty"
                     id="txtEmployeeCode"
@@ -53,10 +53,12 @@
                 </div>
                 <div data-content="Tên nhân viên không được để trống">
                   <input
+                    tabindex="2"
                     novalidate
                     @blur="validateEmty"
                     required
                     type="text"
+                    id="txtEmployeeName"
                     class="input-text input-name"
                     v-model="employee.EmployeeName"
                   />
@@ -73,9 +75,11 @@
                   class="form-department"
                 >
                   <input
+                    tabindex="7"
                     novalidate
                     @blur="validateEmty"
                     required
+                    id="txtEmployeeDepartment"
                     class="choice-current-department"
                     v-model="employee.DepartmentName"
                   />
@@ -138,6 +142,7 @@
                 <div class="form-label">Chức danh</div>
                 <div>
                   <input
+                    tabindex="11"
                     type="text"
                     class="input-text input-position"
                     v-model="employee.PositionName"
@@ -150,13 +155,15 @@
             <div class="form-row date">
               <div class="form-item item-date-of-birth">
                 <div class="form-label">Ngày sinh</div>
-                <div>
+                <div data-content="Ngày sinh không hợp lệ">
                   <input
+                    tabindex="3"
                     :value="bindingDate(employee.DateOfBirth)"
                     @change="onChangeFormatDate"
                     type="date"
                     class="input-text input-date"
                     dateOfBirth
+                    @blur="validateDate"
                   />
                 </div>
               </div>
@@ -164,11 +171,26 @@
                 <div class="form-label">Giới tính</div>
                 <div>
                   <div class="choice-gender">
-                    <input class="gender" name="Gender" type="radio" />
+                    <input
+                      tabindex="4"
+                      class="gender"
+                      name="Gender"
+                      type="radio"
+                    />
                     <span class="name-gender">Nam</span>
-                    <input class="gender" name="Gender" type="radio" />
+                    <input
+                      tabindex="5"
+                      class="gender"
+                      name="Gender"
+                      type="radio"
+                    />
                     <span class="name-gender">Nữ</span>
-                    <input class="gender" name="Gender" type="radio" />
+                    <input
+                      tabindex="6"
+                      class="gender"
+                      name="Gender"
+                      type="radio"
+                    />
                     <span class="name-gender">Khác</span>
                   </div>
                 </div>
@@ -179,6 +201,7 @@
                 <div class="form-label">Mã</div>
                 <div>
                   <input
+                    tabindex="8"
                     type="text"
                     class="input-text input-identity"
                     value=""
@@ -188,7 +211,11 @@
               <div class="form-item">
                 <div class="form-label">Ngày cấp</div>
                 <div>
-                  <input type="date" class="input-text input-date-identity" />
+                  <input
+                    tabindex="9"
+                    type="date"
+                    class="input-text input-date-identity"
+                  />
                 </div>
               </div>
             </div>
@@ -197,6 +224,7 @@
                 <div class="form-label">Nơi cấp</div>
                 <div>
                   <input
+                    tabindex="10"
                     type="text"
                     class="input-text input-position"
                     value=""
@@ -213,6 +241,7 @@
                 <div class="form-label">Địa chỉ</div>
                 <div>
                   <input
+                    tabindex="12"
                     type="text"
                     class="input-text input-address"
                     value=""
@@ -225,6 +254,7 @@
                 <div class="form-label">ĐT di động</div>
                 <div>
                   <input
+                    tabindex="13"
                     type="text"
                     class="input-text input-phone"
                     v-model="employee.PhoneNumber"
@@ -234,16 +264,23 @@
               <div class="form-item">
                 <div class="form-label">ĐT cố định</div>
                 <div>
-                  <input type="text" class="input-text input-phone" value="" />
+                  <input
+                    tabindex="14"
+                    type="text"
+                    class="input-text input-phone"
+                    value=""
+                  />
                 </div>
               </div>
               <div class="form-item">
                 <div class="form-label">Email</div>
                 <div>
                   <input
+                    tabindex="15"
                     type="text"
                     class="input-text input-email"
                     v-model="employee.Email"
+                    id="txtEmployeeEmail"
                   />
                 </div>
               </div>
@@ -253,6 +290,7 @@
                 <div class="form-label">Tài khoản ngân hàng</div>
                 <div>
                   <input
+                    tabindex="16"
                     type="text"
                     class="input-text input-account-bank"
                     value=""
@@ -263,6 +301,7 @@
                 <div class="form-label">Tên ngân hàng</div>
                 <div>
                   <input
+                    tabindex="17"
                     type="text"
                     class="input-text input-name-bank"
                     value=""
@@ -273,6 +312,7 @@
                 <div class="form-label">Chi nhánh</div>
                 <div>
                   <input
+                    tabindex="18"
                     type="text"
                     class="input-text input-place-bank"
                     value=""
@@ -286,14 +326,27 @@
 
         <div class="footer-form">
           <div class="footer-left">
-            <button @click="btnCloseDialog" class="btn btn-cancle">Hủy</button>
+            <button
+              tabindex="21"
+              @click="btnCloseDialog"
+              class="btn btn-cancle"
+            >
+              Hủy
+            </button>
           </div>
           <div class="footer-right">
-            <button @click="btnSaveOnClick" class="btn btn-save">Cất</button>
-            <button @click="btnSaveOnClick" class="btn btn-save-add">
+            <button tabindex="20" @click="btnSaveOnClick" class="btn btn-save">
+              Cất
+            </button>
+            <button
+              tabindex="19"
+              @click="btnSaveOnClick"
+              class="btn btn-save-add"
+            >
               Cất và thêm
             </button>
             <DialogConfirm />
+            <DialogError :message="message" />
           </div>
         </div>
       </div>
@@ -410,62 +463,91 @@ export default {
      * Created date: 13:55 24/04/2022
      */
     btnSaveOnClick(e) {
+      // lấy ra value của các trường bắt buộc email, identityNumber, phoneNumber
+      let valueCode = document.querySelector("#txtEmployeeCode").value;
+      let valueName = document.querySelector("#txtEmployeeName").value;
+      let valueDepartment = document.querySelector(
+        "#txtEmployeeDepartment"
+      ).value;
+      let dialogError = document.querySelector(".m-dialog-error");
       let me = this;
-      if (this.formMode == this.MISAEnum.FormMode.Add) {
-        // thu thập thông tin nhân viên
-        // gọi api lưu dữ liệu
-        let employee = this.employee;
-        axios
-          .post("http://amis.manhnv.net/api/v1/Employees", employee)
-          .then(() => {
-            this.TheLoading(1500);
-            if (e.target.classList.contains("btn-save-add")) {
-              me.employee = {};
-              axios
-                .get("http://amis.manhnv.net/api/v1/Employees/NewEmployeeCode")
-                .then((res) => {
-                  me.employee.EmployeeCode = res.data;
-                  // focus vào ô nhâp liệu đầu tiên
-                  document.getElementById("txtEmployeeCode").focus();
-                });
-            } else if (e.target.classList.contains("btn-save")) {
-              this.btnCloseDialog();
-            }
-            this.reloadData();
-            setTimeout(() => {
-              this.showToastMsgSuccess("Thêm nhân viên thành công");
-            }, 1500);
-          })
-          .catch((error) => {
-            console.log(error.response.data.userMsg)
-          })
+      // Nếu 3 trường đều có dữ liệu
+      if (valueCode && valueName && valueDepartment) {
+        if (this.formMode == this.MISAEnum.FormMode.Add) {
+          // thu thập thông tin nhân viên
+          // gọi api lưu dữ liệu
+          let employee = this.employee;
+          axios
+            .post("http://amis.manhnv.net/api/v1/Employees", employee)
+            .then(() => {
+              this.TheLoading(1500);
+              if (e.target.classList.contains("btn-save-add")) {
+                me.employee = {};
+                document.getElementById("txtEmployeeCode").focus();
+                axios
+                  .get(
+                    "http://amis.manhnv.net/api/v1/Employees/NewEmployeeCode"
+                  )
+                  .then((res) => {
+                    me.employee.EmployeeCode = res.data;
+                    // focus vào ô nhâp liệu đầu tiên
+                  });
+              } else if (e.target.classList.contains("btn-save")) {
+                this.btnCloseDialog();
+              }
+              this.reloadData();
+              setTimeout(() => {
+                this.showToastMsgSuccess("Thêm nhân viên thành công");
+              }, 1500);
+            })
+            .catch((error) => {
+              console.log(error.response.data.userMsg);
+            });
+        } else {
+          // formmode = put
+          let employee = this.employee;
+
+          axios
+            // update dữ liệu employee
+
+            .put(
+              `http://amis.manhnv.net/api/v1/Employees/${employee.EmployeeId}`,
+              employee
+            )
+            .then(() => {
+              this.TheLoading(1500);
+              if (e.target.classList.contains("btn-save-add")) {
+                me.employee = {};
+                axios
+                  .get(
+                    "http://amis.manhnv.net/api/v1/Employees/NewEmployeeCode"
+                  )
+                  .then((res) => {
+                    me.employee.EmployeeCode = res.data;
+                    // focus vào ô nhâp liệu đầu tiên
+                    document.getElementById("txtEmployeeCode").focus();
+                  });
+              } else if (e.target.classList.contains("btn-save")) {
+                this.btnCloseDialog();
+              }
+              this.showToastMsgSuccess("Cập nhật nhân viên thành công");
+            });
+        }
       } else {
-        // formmode = put
-        let employee = this.employee;
+        // nếu có 1 trong 3 trường bắt buộc trống thì báo lỗi
+        if (!valueCode) {
+          dialogError.removeAttribute("hidden");
+          me.message = "Mã nhân viên không được để trống";
+          
+        } else if (!valueName) {
+          dialogError.removeAttribute("hidden");
+          me.message = "Tên không được để trống";
+         
+        } else if (!valueDepartment) {
+          dialogError.removeAttribute("hidden");
+          me.message = "Phòng ban không được để trống";
 
-        axios
-          // update dữ liệu employee
-
-          .put(
-            `http://amis.manhnv.net/api/v1/Employees/${employee.EmployeeId}`,
-            employee
-          )
-          .then(() => {
-            this.TheLoading(1500);
-            if (e.target.classList.contains("btn-save-add")) {
-              me.employee = {};
-              axios
-                .get("http://amis.manhnv.net/api/v1/Employees/NewEmployeeCode")
-                .then((res) => {
-                  me.employee.EmployeeCode = res.data;
-                  // focus vào ô nhâp liệu đầu tiên
-                  document.getElementById("txtEmployeeCode").focus();
-                });
-            } else if (e.target.classList.contains("btn-save")) {
-              this.btnCloseDialog();
-            }
-            this.showToastMsgSuccess("Cập nhật nhân viên thành công");
-          });
+        }
       }
     },
     /**
@@ -529,6 +611,39 @@ export default {
     TheLoading(ms) {
       this.$emit("TheLoading", ms);
     },
+    /**
+     * Mô tả : Validate ngày
+     * @param
+     * @return
+     * Created by: Cao Thanh Lâm - MF1103
+     * Created date: 13:28 03/05/2022
+     */
+    validateDate(e) {
+      var dateObj = new Date();
+      var month = dateObj.getUTCMonth() + 1; //months from 1-12
+      if (month < 10) {
+        month = "0" + month;
+      }
+      var day = dateObj.getUTCDate();
+      if (day < 10) {
+        day = "0" + day;
+      }
+      var year = dateObj.getUTCFullYear();
+      this.dateNow = year + "-" + month + "-" + day;
+
+      let value = e.target.value;
+      if (value > this.dateNow) {
+        e.target.value = "";
+        e.target.parentElement.previousElementSibling.classList.add("error");
+        e.target.style.borderColor = "red";
+        setTimeout(() => {
+          e.target.style.borderColor = "#babec5";
+          e.target.parentElement.previousElementSibling.classList.remove(
+            "error"
+          );
+        }, 3000);
+      }
+    },
   },
   data() {
     return {
@@ -536,10 +651,35 @@ export default {
       employee: {},
       // danh sách departments
       departments: [],
+      tabindex: 1,
+      dateNow: "",
+      message: "",
     };
   },
   mounted() {
-    document.querySelector(".input-text.input-code");
+    const a = document.querySelector(".m-dialog-form");
+    a.addEventListener("keyup", (e) => {
+      console.log(e.target);
+      if (e.target.getAttribute("tabindex") == "4") {
+        e.target.checked = true;
+      } else {
+        e.target.checked = false;
+      }
+
+      if (e.target.getAttribute("tabindex") == 21) {
+        e.target.onkeydown = function (evt) {
+          evt = evt || window.event;
+          if (evt.keyCode == 9) {
+            evt.preventDefault();
+            document.querySelector("#txtEmployeeCode").focus();
+            document.removeEventListener("onkeydown", function stopIt(e) {
+              e.preventDefault();
+              e.stopPropagation();
+            });
+          }
+        };
+      }
+    });
   },
   created() {
     // lấy dữ liệu từ trên data

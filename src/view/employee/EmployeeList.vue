@@ -360,12 +360,15 @@ export default {
         me.showOrHideDialog(true);
         // gán employeeSelected bằng hàm rỗng
         me.employeeSelected = {};
+        me.$nextTick(() => {
+          document.querySelector("[tabindex='4']").checked = true;
+          document.getElementById("txtEmployeeCode").focus();
+        });
         axios
           .get("http://amis.manhnv.net/api/v1/Employees/NewEmployeeCode")
           .then((res) => {
             me.employeeSelected.EmployeeCode = res.data;
             // focus vào ô nhâp liệu đầu tiên
-            document.getElementById("txtEmployeeCode").focus();
           })
           .catch((err) => {
             console.log(err);
@@ -453,7 +456,7 @@ export default {
             "black";
         }
       }, 50);
-      document.querySelector(".input-text.input-date").style.color = "#ccc";  
+      document.querySelector(".input-text.input-date").style.color = "#ccc";
       // lấy thông tin nhân viên
       // C1 lây thôn tin nhân viên có sẵn dưới clients
       // C2 lấy thông tin nhân viên từ Api
@@ -491,6 +494,13 @@ export default {
       toastMsgSuccess.removeAttribute("hidden");
       setTimeout(() => toastMsgSuccess.setAttribute("hidden", "true"), 3000);
     },
+    /**
+     * Mô tả : Hàm lọc dữ liệu theo yêu cầu
+     * @param
+     * @return
+     * Created by: Cao Thanh Lâm - MF1103
+     * Created date: 20:08 29/04/2022
+     */
     filterEmployee() {
       const me = this;
 
@@ -498,41 +508,58 @@ export default {
         .get(
           `http://amis.manhnv.net/api/v1/Employees/filter?pageSize=${me.quantityEmployeeDefault}&pageNumber=${me.numberPageSelected}&employeeFilter=${me.searchValue}`
         )
-        .then(function (res) {
+        .then( async function (res) {
+          // lấy liệu trả về
           me.employees = res.data.Data;
+          // gán tổng số lượng trang
           me.totalNumberPage = res.data.TotalPage;
+          // gán tổng số lượng bản ghi
           me.totalEmployees = res.data.TotalRecord;
+          // nếu không tồn tại dữ liệu
           if (!me.employees) {
+            // gán page được chọn là page thứ nhất
             me.numberPageSelected = 1;
+
+            // nếu có dữ liệu search
             if (me.searchValue) {
-              console.log("không có nhân viên nào");
+              // gán tổng page bằng 1
               me.totalNumberPage = 1;
+              // gọi hàm defaultPage
               me.defaultPageNumberEmployee();
-            } else {
+            }  else {
+              // nếu không có dữ liệu search truyền vào thì gọi lại hàm filterEmployee
               me.filterEmployee();
             }
-
             setTimeout(() => {
               me.defaultPageNumberEmployee();
             }, 200);
           }
           setTimeout(() => {
+            // Lấy value page được chọn
             let numberpageSelected = document
               .querySelector("div[value].number-page-item.selected")
               .getAttribute("value");
+            // nếu page được chọn có value > 1
             if (numberpageSelected > 1) {
               document
+                // remove class incapability của nút prev
                 .querySelector(".btn-prev")
                 .classList.remove("incapability");
               document
+                // add class incapability của nút next
                 .querySelector(".btn-next")
                 .classList.remove("incapability");
+              // page được chọn = tổng số pageNumberSelected
               if (numberpageSelected == me.totalNumberPage) {
                 document
+                  // thêm class incapability của nút next
                   .querySelector(".btn-next")
                   .classList.add("incapability");
               }
-            } else if (numberpageSelected == 1 && me.totalNumberPage > 1) {
+            }
+            // nếu numberpageSelected = 1 và tổng số page > 1
+            else if (numberpageSelected == 1 && me.totalNumberPage > 1) {
+              // thêm class incapability vào nút prev
               document.querySelector(".btn-prev").classList.add("incapability");
               document
                 .querySelector(".btn-next")
@@ -574,40 +601,70 @@ export default {
      * Created date: 09:45 29/04/2022
      */
     choiceNumberPage(e) {
+      // chọn tất cả các thẻ html chứa class number-page-item
       let pagesNumberEmployee = document.querySelectorAll(".number-page-item");
+      // remove tất cả các class selected
       pagesNumberEmployee.forEach((item) => {
         item.classList.remove("selected");
       });
       let pageNumberSelected = e.target;
+      // add class selected vào page chọn
       pageNumberSelected.classList.add("selected");
       this.numberPageSelected = pageNumberSelected.getAttribute("value");
-
+      // gọi lại tìm kiếm dữ liệu
       this.filterEmployee();
     },
+    /**
+     * Mô tả : Hàm chọn mặc định page đầu tiên là page thứ nhất
+     * @param
+     * @return
+     * Created by: Cao Thanh Lâm - MF1103
+     * Created date: 17:04 28/04/2022
+     */
     defaultPageNumberEmployee() {
       document
         .querySelectorAll(".number-page-item")[0]
         .classList.add("selected");
     },
+    /**
+     * Mô tả : Chọn số lượng employee trên một trang
+     * @param
+     * @return
+     * Created by: Cao Thanh Lâm - MF1103
+     * Created date: 20:03 29/04/2022
+     */
     choiceNumberEmployeeInTables(e) {
       let me = this;
       let choiceNumberEmployeeInTable = e.target;
+      // kiểm tra xem có phảu là choice number hay không
       let conditionsNumberEmployee =
         choiceNumberEmployeeInTable.classList.contains("choice-number-item");
       if (conditionsNumberEmployee) {
+        // remove hết tất cả các phần tử có class là choice-number-item và remove class active
         document.querySelectorAll(".choice-number-item").forEach((item) => {
           item.classList.remove("active");
         });
+        // add class active cho phần tử được chọn
         choiceNumberEmployeeInTable.classList.add("active");
+        // lấy phần từ chứa class choice-current-number""
         let choiceCurrentDisplay = document.querySelector(
           ".choice-current-number"
         );
+        // thay đổi text của phần tử chứa class choice-current-number
         choiceCurrentDisplay.innerHTML = choiceNumberEmployeeInTable.innerHTML;
         me.quantityEmployeeDefault =
           choiceNumberEmployeeInTable.getAttribute("value");
+        // chạy hàm lọc dữ liệu
         me.filterEmployee();
       }
     },
+    /**
+     * Mô tả : Hàm chọn page trước
+     * @param
+     * @return
+     * Created by: Cao Thanh Lâm - MF1103
+     * Created date: 20:24 29/04/2022
+     */
     prePage() {
       const me = this;
       let pageNowSelected = document.querySelector(
@@ -622,6 +679,13 @@ export default {
         me.filterEmployee();
       }
     },
+    /**
+     * Mô tả : Hàm chọn page sau
+     * @param
+     * @return
+     * Created by: Cao Thanh Lâm - MF1103
+     * Created date: 20:24 29/04/2022
+     */
     nextPage() {
       const me = this;
       let pageNowSelected = document.querySelector(
@@ -654,8 +718,16 @@ export default {
           .classList.remove("active");
       }
     },
+    /**
+     * Mô tả : Hàm kiểm tra check all các input check box
+     * @param
+     * @return
+     * Created by: Cao Thanh Lâm - MF1103
+     * Created date: 20:25 29/04/2022
+     */
     check() {
       let check = document.querySelector("input[type=checkbox]:checked");
+      
       if (check) {
         document.querySelector("#convenient-header2").classList.add("active");
       } else {
@@ -664,6 +736,13 @@ export default {
           .classList.remove("active");
       }
     },
+    /**
+     * Mô tả : Hàm xóa nhiều nhân viên
+     * @param
+     * @return
+     * Created by: Cao Thanh Lâm - MF1103
+     * Created date: 20:25 29/04/2022
+     */
     deleteEmployees() {
       const me = this;
       me.employeesSelected = [];
@@ -745,7 +824,7 @@ export default {
   },
   mounted() {
     this.defaultPageNumberEmployee();
-    this.TheLoading(3500);
+    this.TheLoading(50);
   },
 
   beforeUnmount() {},
