@@ -19,7 +19,7 @@
           <div class="btn-help-form">
             <div class="btn-help-form-icon"></div>
           </div>
-          <div @click="btnCloseDialog" class="btn-close-form">
+          <div @click="btnCloseOrSave" class="btn-close-form">
             <div class="btn-close-form-icon"></div>
           </div>
         </div>
@@ -364,7 +364,7 @@ import axios from "axios";
 
 export default {
   name: "the-employee-detail",
-  props: ["isShow", "employeeSelectedInChil", "formMode"],
+  props: ["isShow", "employeeSelectedInChil", "formMode", "cloneObject"],
   components: {
     DialogConfirm,
     DialogError,
@@ -380,6 +380,10 @@ export default {
   watch: {
     employeeSelectedInChil: function (newValue) {
       this.employee = newValue;
+    },
+    cloneObject: function (newValue) {
+      this.cloneObjectChild = newValue;
+      console.log(this.cloneObjectChild);
     },
   },
   methods: {
@@ -420,7 +424,57 @@ export default {
      * Created date: 13:53 21/04/2022
      */
     btnCloseDialog() {
-      this.$emit("closeOnClick", false);
+      const me = this;
+      me.$emit("closeOnClick", false);
+
+    },
+    /**
+    * Mô tả : Hỏi lưu khi thay đổi dư liệu
+    * @param
+    * @return
+    * Created by: Cao Thanh Lâm
+    * Created date: 11:09 06/05/2022
+    */
+    btnCloseOrSave() {
+      const me = this;
+      const _ = require("lodash");
+      let compareObject = _.isEqual(this.employee, this.cloneObjectChild);
+      if (!compareObject) {
+        //add sự kiện onclick vào các nút
+        document.querySelector(".m-dialog-confirm").removeAttribute("hidden");
+        console.log(document.querySelector(".m-dialog-confirm #btn-agree"));
+        document.querySelector(".m-dialog-confirm #btn-agree").onclick = () => {
+          document
+            .querySelector(".m-dialog-confirm")
+            .setAttribute("hidden", "true");
+          let employee = this.employee;
+          // lưu nhân viên khi đồng ý
+          axios
+            .post("http://amis.manhnv.net/api/v1/Employees", employee)
+            .then(() => {
+              me.TheLoading(1500);
+              setTimeout(() => {
+                this.showToastMsgSuccess("Thêm nhân viên thành công");
+              }, 1500);
+              me.$emit("closeOnClick", false);
+            });
+        };
+
+        document.querySelector(".m-dialog-confirm .m-button-disagree").onclick =
+          () => {
+            document
+              .querySelector(".m-dialog-confirm")
+              .setAttribute("hidden", "true");
+          };
+        document.querySelector(".m-dialog-confirm #disagree").onclick = () => {
+          me.$emit("closeOnClick", false);
+          document
+            .querySelector(".m-dialog-confirm")
+            .setAttribute("hidden", "true");
+        };
+      } else {
+        me.$emit("closeOnClick", false);
+      }
     },
     /**
      * Mô tả : Hàm reload lại dữu liệu
@@ -465,6 +519,8 @@ export default {
     btnSaveOnClick(e) {
       // lấy ra value của các trường bắt buộc email, identityNumber, phoneNumber
       let valueCode = document.querySelector("#txtEmployeeCode").value;
+
+
       let valueName = document.querySelector("#txtEmployeeName").value;
       let valueDepartment = document.querySelector(
         "#txtEmployeeDepartment"
@@ -538,15 +594,12 @@ export default {
         if (!valueCode) {
           dialogError.removeAttribute("hidden");
           me.message = "Mã nhân viên không được để trống";
-          
         } else if (!valueName) {
           dialogError.removeAttribute("hidden");
           me.message = "Tên không được để trống";
-         
         } else if (!valueDepartment) {
           dialogError.removeAttribute("hidden");
           me.message = "Phòng ban không được để trống";
-
         }
       }
     },
@@ -654,12 +707,19 @@ export default {
       tabindex: 1,
       dateNow: "",
       message: "",
+      cloneObjectChild: {},
     };
   },
   mounted() {
+    /**
+    * Mô tả : Tạo tab index cho form
+    * @param
+    * @return
+    * Created by: Cao Thanh Lâm
+    * Created date: 11:07 06/05/2022
+    */
     const a = document.querySelector(".m-dialog-form");
     a.addEventListener("keyup", (e) => {
-      console.log(e.target);
       if (e.target.getAttribute("tabindex") == "4") {
         e.target.checked = true;
       } else {
@@ -670,6 +730,7 @@ export default {
         e.target.onkeydown = function (evt) {
           evt = evt || window.event;
           if (evt.keyCode == 9) {
+            // Ngăn chặn tab khỏi ra ngoài bảng
             evt.preventDefault();
             document.querySelector("#txtEmployeeCode").focus();
             document.removeEventListener("onkeydown", function stopIt(e) {

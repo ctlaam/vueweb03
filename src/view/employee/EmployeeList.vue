@@ -190,7 +190,7 @@
                       Sửa
                       <ul class="choice-action">
                         <li
-                          @click.stop="showDialogDeleteEmployee(emp)"
+                          @click.stop="showDialogDeleteEmployee($event, emp)"
                           class="choice-action-item"
                         >
                           Xóa
@@ -215,7 +215,7 @@
         </div>
         <div class="m-paging-right">
           <div class="employee-in-tables" ref="cbb">
-            <p class="choice-current-number">Tất cả các bản ghi</p>
+            <p class="choice-current-number">10 bản ghi trên trang</p>
             <div @click="toggle" class="box-icon-choice-number">
               <div class="icon-choice-number"></div>
             </div>
@@ -224,7 +224,7 @@
               v-show="open"
               class="choices-number-employee"
             >
-              <div class="choice-number-item" value="10">
+              <div class="choice-number-item active" value="10">
                 10 bản ghi trên trang
               </div>
               <div class="choice-number-item" value="20">
@@ -238,9 +238,6 @@
               </div>
               <div class="choice-number-item" value="100">
                 100 bản ghi trên trang
-              </div>
-              <div class="choice-number-item active" :value="totalEmployees">
-                Tất cả các bản ghi
               </div>
             </div>
           </div>
@@ -260,7 +257,7 @@
               </div>
               <div v-if="false" class="number-page-item">...</div>
             </div>
-            <div @click="nextPage" class="btn btn-next incapability">Sau</div>
+            <div @click="nextPage" class="btn btn-next ">Sau</div>
           </div>
         </div>
       </div>
@@ -276,6 +273,7 @@
       :formMode="formMode"
       @showToastMsgSuccess="showToastMsgSuccess"
       @TheLoading="TheLoading"
+      :cloneObject="cloneObject"
     />
     <DialogDelete
       :employeeSelectedInChil="employeeSelected"
@@ -369,6 +367,8 @@ export default {
           .then((res) => {
             me.employeeSelected.EmployeeCode = res.data;
             // focus vào ô nhâp liệu đầu tiên
+            me.cloneObject = { ...me.employeeSelected };
+            console.log(me.cloneObject);
           })
           .catch((err) => {
             console.log(err);
@@ -449,6 +449,7 @@ export default {
 
       me.formMode = this.MISAEnum.FormMode.Edit;
       this.employeeSelected = emp;
+      this.cloneObject = emp;
       setTimeout(function () {
         document.getElementById("txtEmployeeCode").focus();
         if (document.querySelector(".input-text.input-date").value) {
@@ -473,12 +474,14 @@ export default {
      * Created by: Cao Thanh Lâm - MF1103
      * Created date: 13:33 24/04/2022
      */
-    showDialogDeleteEmployee(emp) {
+    showDialogDeleteEmployee(event, emp) {
+      console.log(event.target);
       const me = this;
       me.msgDelete = "";
       // hiển thị dilog xác nhận xóa
       document.querySelector(".m-dialog-delete").removeAttribute("hidden");
       this.employeeSelected = emp;
+
       me.formMode = this.MISAEnum.FormMode.Delete;
     },
     /**
@@ -508,7 +511,7 @@ export default {
         .get(
           `http://amis.manhnv.net/api/v1/Employees/filter?pageSize=${me.quantityEmployeeDefault}&pageNumber=${me.numberPageSelected}&employeeFilter=${me.searchValue}`
         )
-        .then( async function (res) {
+        .then(async function (res) {
           // lấy liệu trả về
           me.employees = res.data.Data;
           // gán tổng số lượng trang
@@ -526,7 +529,7 @@ export default {
               me.totalNumberPage = 1;
               // gọi hàm defaultPage
               me.defaultPageNumberEmployee();
-            }  else {
+            } else {
               // nếu không có dữ liệu search truyền vào thì gọi lại hàm filterEmployee
               me.filterEmployee();
             }
@@ -727,7 +730,7 @@ export default {
      */
     check() {
       let check = document.querySelector("input[type=checkbox]:checked");
-      
+
       if (check) {
         document.querySelector("#convenient-header2").classList.add("active");
       } else {
@@ -745,6 +748,7 @@ export default {
      */
     deleteEmployees() {
       const me = this;
+      me.employeeSelected = {};
       me.employeesSelected = [];
       let a = document.querySelectorAll("td input[type=checkbox]:checked");
       console.log(a.length);
@@ -782,6 +786,7 @@ export default {
       // Danh sách nhân viên được chọn
       employeesSelected: [],
       msgDelete: "",
+      cloneObject: {},
     };
   },
   // 2created
@@ -801,11 +806,15 @@ export default {
 
     // lấy dự liệu danh sách nhiên viên
     axios
-      .get("http://amis.manhnv.net/api/v1/Employees")
+      .get(
+        `http://amis.manhnv.net/api/v1/Employees/filter?pageSize=10&pageNumber=1&employeeFilter=`
+      )
       .then(function (res) {
-        me.employees = res.data;
-        me.totalEmployees = res.data.length;
-        me.quantityEmployeeDefault = res.data.length;
+        console.log(res.data)
+        me.employees = res.data.Data;
+        me.totalEmployees = res.data.TotalRecord;
+        me.quantityEmployeeDefault = 10;
+        me.totalNumberPage = res.data.TotalPage;
       })
       .catch(function (err) {
         // kiểm tra mã lỗi của api và thực hiện thao tác với các mã lỗi đó

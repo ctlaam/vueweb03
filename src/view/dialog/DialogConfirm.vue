@@ -16,10 +16,10 @@
           </button>
         </div>
         <div class="m-right-btn">
-          <button class="m-button-agree m-button-disagree m-layout-btn">
-            Cất
+          <button id="disagree" class="m-button-agree m-button-disagree m-layout-btn">
+            Khong
           </button>
-          <button class="m-button-agree">Đồng ý</button>
+          <button id="btn-agree" class="m-button-agree">Đồng ý</button>
         </div>
       </div>
     </div>
